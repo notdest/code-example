@@ -12,7 +12,7 @@ services:
       APP_DEBUG: "true"
       APP_URL: http://localhost
 
-      LOG_CHANNEL: stack
+      LOG_CHANNEL: stderr
 
       DB_CONNECTION: mysql
       DB_HOST: mysql
@@ -36,11 +36,11 @@ services:
     environment:
       APP_NAME: parser
       APP_ENV: local
-      APP_KEY:
+      APP_KEY: base64:GFxK2i0YVIT3Te2U9x6/BtD2yQs06EhuiqemBRvXhZI=
       APP_DEBUG: "true"
       APP_URL: http://localhost
 
-      LOG_CHANNEL: stack
+      LOG_CHANNEL: stderr
 
       DB_CONNECTION: mysql
       DB_HOST: mysql
