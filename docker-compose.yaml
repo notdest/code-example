@@ -6,6 +6,7 @@ services:
     image: fppressa/nginx-fpm:1.17.9-7.4-dev
     ports:
       - 8787:80
+    working_dir: /var/www
     environment:
       APP_NAME: parser
       APP_ENV: local
