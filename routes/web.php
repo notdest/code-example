@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/platforms/list',       'PlatformController@list');
+Route::get('/platforms/alphabet',   'PlatformController@alphabet');
+
