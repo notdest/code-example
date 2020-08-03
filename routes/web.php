@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::get('/platforms/list',       'PlatformController@list');
 Route::get('/platforms/alphabet',   'PlatformController@alphabet');
@@ -25,3 +22,4 @@ Route::get('/persons/',                 'PersonController@index');
 Route::get('/persons/delete/{id}/',   'PersonController@delete');
 
 
+Route::get('/',                 'PostController@index');
