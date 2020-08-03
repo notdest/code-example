@@ -20,3 +20,8 @@ Route::get('/', function () {
 Route::get('/platforms/list',       'PlatformController@list');
 Route::get('/platforms/alphabet',   'PlatformController@alphabet');
 
+
+Route::get('/persons/',                 'PersonController@index');
+Route::get('/persons/delete/{id}/',   'PersonController@delete');
+
+
