@@ -9,6 +9,10 @@
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
+    <script src="/js/jquery-3.5.1.slim.min.js" ></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
     <!-- Custom styles for this template -->
     <link href="/css/dashboard.css" rel="stylesheet">
 </head>
@@ -20,13 +24,17 @@
         <span class="navbar-toggler-icon"></span>
     </button>
 
-    <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
+    @hasSection('search')
+        @yield('search')
+    @else
+        <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
 
-    <ul class="navbar-nav px-3">
-        <li class="nav-item text-nowrap">
-            <a class="nav-link" href="#">Sign out</a>
-        </li>
-    </ul>
+        <ul class="navbar-nav px-3">
+            <li class="nav-item text-nowrap">
+                <a class="nav-link" href="#">Sign out</a>
+            </li>
+        </ul>
+    @endif
 </nav>
 
 <div class="container-fluid">
@@ -63,7 +71,6 @@
     </div>
 </div>
 
-<script src="/js/jquery-3.5.1.slim.min.js" ></script>
 <script src="/js/bootstrap.bundle.min.js" ></script>
 
 

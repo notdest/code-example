@@ -1,6 +1,63 @@
 
 @extends('layouts.main')
 
+@section('search')
+    <script type="text/javascript">
+        $( document ).ready(function() {
+            $('input[name="from"]').daterangepicker({
+                singleDatePicker: true ,
+                timePicker: true,
+                timePicker24Hour: true,
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
+            });
+            $('input[name="to"]').daterangepicker({
+                singleDatePicker: true ,
+                timePicker: true,
+                timePicker24Hour: true,
+                locale: {
+                    format: 'YYYY-MM-DD HH:mm:ss'
+                }
+            });
+        });
+    </script>
+    <form method="get" class="col-md-10">
+        <div class="row">
+            <div class="col-2">
+                <select name="person" class="form-control form-control-dark">
+                    <option value="0"> - персона - </option>
+
+                    @foreach ($persons as $person)
+                        <option value="{!! $person->id !!}" {{ ($search->person == $person->id ) ? "selected" : "" }}>
+                            {{ $person->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-2">
+                <select name="source" class="form-control form-control-dark">
+                    <option value="0">Instagram</option>
+                    <option value="1" {{ ($search->source == 1 ) ? "selected" : "" }}>Facebook</option>
+                </select>
+            </div>
+
+            <div class="col-2">
+                <input type="text" class="form-control form-control-dark" name="from" value="{!! $search->from !!}">
+            </div>
+
+            <div class="col-2">
+                <input type="text" class="form-control form-control-dark" name="to" value="{!! $search->to !!}">
+            </div>
+
+            <div class="col">
+                <input type="submit" value="Искать" class="btn btn-primary">
+            </div>
+        </div>
+    </form>
+@endsection
+
 @section('content')
 
     <h2>Посты</h2>
@@ -27,5 +84,5 @@
     </div>
 
 
-    {{ $posts->links() }}
+    {{ $posts->withQueryString()->links() }}
 @endsection
