@@ -38,6 +38,9 @@ env:
   REDIS_PASSWORD: "null"
   REDIS_PORT: "6379"
 
+  INSTAGRAM_LOGIN: "alexk7084"
+  INSTAGRAM_PASSWORD: "imedia123"
+
 db:
   migrations: true
 
