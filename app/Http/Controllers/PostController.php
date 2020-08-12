@@ -16,13 +16,14 @@ class PostController extends Controller
         $search->from   = $request->from    ?? date('Y-m-d 00:00:00');
         $search->to     = $request->to      ?? date('Y-m-d 23:59:59');
 
-        $persons    = DB::select("SELECT * FROM `persons` LIMIT 20");
+        $persons    = DB::select("SELECT * FROM `persons` ");
 
         $posts  = DB::table('posts')
                     ->join('sources', 'posts.sourceId', '=', 'sources.id')
                     ->join('persons', 'sources.personId', '=', 'persons.id')
                     ->where('createdTime','>=',$search->from )
-                    ->where('createdTime','<=',$search->to );
+                    ->where('createdTime','<=',$search->to )
+                    ->orderBy('createdTime', 'desc');
 
         if($search->person){
             $posts  = $posts->where('sources.personId','=',$search->person);
