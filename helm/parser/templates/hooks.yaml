@@ -1,0 +1,42 @@
+{{- if .Values.db.migrations -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "parser.fullname" . }}-migrations
+  labels:
+    {{- include "parser.labels" . | nindent 4 }}
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook":  pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy":  before-hook-creation
+spec:
+  template:
+    metadata:
+      name: {{ include "parser.fullname" . }}-migrations
+      labels:
+        {{- include "parser.labels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: migrations-job
+        image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+        command: ["./artisan"]
+        args: ["migrate","--force"]
+        env:
+          - name: QUERY_LOG_TO_STDOUT
+            value: "true"
+          - name: DB_CONNECTION
+            value: 'mysql'
+          - name: DB_HOST
+            value: '{{ .Values.env.DB_HOST }}'
+          - name: DB_PORT
+            value: '{{ .Values.env.DB_PORT }}'
+          - name: DB_DATABASE
+            value: '{{ .Values.env.DB_DATABASE }}'
+          - name: DB_USERNAME
+            value: '{{ .Values.env.DB_USERNAME }}'
+          - name: DB_PASSWORD
+            value: '{{ .Values.env.DB_PASSWORD }}'
+{{- end }}
