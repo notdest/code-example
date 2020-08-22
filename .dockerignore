@@ -1,0 +1,11 @@
+.git/
+.idea/
+vendor/
+ansible/
+docker/Dockerfile
+docker-compose.yaml
+.gitignore
+.gitlab-ci.yml
+README.md
+_ide_helper.php
+helm/

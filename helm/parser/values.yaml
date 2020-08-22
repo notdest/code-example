@@ -1,0 +1,136 @@
+# Default values for parser.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: eu.gcr.io/feshn-press-llc/parser
+  pullPolicy: Always
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+env:
+  APP_NAME: "parser"
+  APP_ENV: "local"
+  APP_KEY: "base64:GFxK2i0YVIT3Te2U9x6/BtD2yQs06EhuiqemBRvXhZI="
+  APP_DEBUG: "true"
+  APP_URL: "https://parser.fppressa.ru"
+
+  LOG_CHANNEL: "stderr"
+
+  DB_CONNECTION: "mysql"
+  DB_HOST: "10.167.136.23"
+  DB_PORT: "3306"
+  DB_DATABASE: "parser"
+  DB_USERNAME: "developer"
+  DB_PASSWORD: "c2Zs3hJwQ7UM6fwK"
+
+  BROADCAST_DRIVER: "log"
+  CACHE_DRIVER: "file"
+  QUEUE_CONNECTION: "redis"
+  SESSION_DRIVER: "file"
+  SESSION_LIFETIME: "120"
+
+  REDIS_HOST: "parser-redis-master"
+  REDIS_PASSWORD: "null"
+  REDIS_PORT: "6379"
+
+  INSTAGRAM_LOGIN: "alexk7084"
+  INSTAGRAM_PASSWORD: "imedia123"
+
+db:
+  migrations: true
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: parser.fppressa.ru
+      paths:
+        - /
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+     cpu: 100m
+     memory: 128Mi
+
+nodeSelector:
+  preemptible: "true"
+
+tolerations:
+  - key: "preemptible"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+
+affinity: {}
+
+# ===== Redis chart config =====
+redis:
+  enabled: true
+  usePassword: false
+
+  cluster:
+    enabled: false
+    slaveCount: 0
+
+  master:
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 50m
+
+    persistence:
+      enabled: false
+
+    metrics:
+      enabled: true
+
+    nodeSelector:
+      preemptible: "true"
+
+    tolerations:
+      - key: "preemptible"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"

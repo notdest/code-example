@@ -1,0 +1,50 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  VERSION: "${CI_COMMIT_REF_SLUG}-${CI_COMMIT_SHORT_SHA}"
+
+build:
+  image: docker:stable
+  services:
+    - docker:stable-dind
+  stage: build
+  script:
+    - echo "${GCR_KEY}" | docker login -u _json_key --password-stdin https://eu.gcr.io
+    - docker build -t ${DOCKER_REGISTRY}/parser:${VERSION} -f docker/Dockerfile .
+    - docker push ${DOCKER_REGISTRY}/parser:${VERSION}
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+    - if: $CI_COMMIT_REF_NAME =~ /^.+$/
+      when: manual
+    - when: never
+  tags:
+    - default
+
+Deploy to gke:
+  image: kiwigrid/gcloud-kubectl-helm:3.1.1-282.0.0-240
+  stage: deploy
+  before_script:
+    - echo "$GKE_KEY" > gke_key.json
+    - gcloud auth activate-service-account --key-file=gke_key.json
+    - gcloud config set project $GCP_PROJECT
+    - gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION --project $GCP_PROJECT
+  script:
+    - cd ./helm/parser
+    - 'sed -i "/appVersion:/c\appVersion: ${VERSION}" Chart.yaml'
+    - helm dependency update
+    - helm upgrade --install -n parser parser .
+  dependencies:
+    - build
+  environment:
+    name: master
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      when: manual
+    - if: $CI_COMMIT_REF_NAME =~ /^.+$/
+      when: manual
+    - when: never
+  tags:
+    - default
+
