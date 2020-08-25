@@ -22,7 +22,7 @@ spec:
             args: ["schedule:run"]
             envFrom:
               - configMapRef:
-                  name: {{ include "parser.fullname" . }}-config
+                  name: {{ include "parser.fullname" . }}
             resources:
               {{- toYaml .Values.scheduler.resources | nindent 14 }}
           restartPolicy: Never
