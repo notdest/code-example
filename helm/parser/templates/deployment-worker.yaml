@@ -28,7 +28,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["./artisan"]
-          args: ["queue:listen"]
+          args: ["queue:listen", "--timeout=900"]
           envFrom:
             - configMapRef:
                 name: {{ include "parser.fullname" . }}
