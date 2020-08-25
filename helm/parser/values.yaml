@@ -44,6 +44,15 @@ env:
 db:
   migrations: true
 
+scheduler:
+  enabled: true
+  schedule: "*/1 * * * *"
+  startingDeadlineSeconds: "200"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: "3"
+  failedJobsHistoryLimit: "1"
+
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true

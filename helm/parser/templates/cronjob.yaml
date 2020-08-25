@@ -1,0 +1,37 @@
+{{- if .Values.scheduler.enabled -}}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ include "parser.fullname" . }}-scheduler
+  labels:
+    {{- include "parser.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.scheduler.schedule | quote }}
+  startingDeadlineSeconds: {{ .Values.scheduler.startingDeadlineSeconds }}
+  concurrencyPolicy: {{ .Values.scheduler.concurrencyPolicy }}
+  successfulJobsHistoryLimit: {{ .Values.scheduler.successfulJobsHistoryLimit }}
+  failedJobsHistoryLimit: {{ .Values.scheduler.failedJobsHistoryLimit }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: {{ .Chart.Name }}-scheduler
+            image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
+            command: ["./artisan"]
+            args: ["schedule:run"]
+            envFrom:
+              - configMapRef:
+                  name: {{ include "parser.fullname" . }}-config
+            resources:
+              {{- toYaml .Values.scheduler.resources | nindent 14 }}
+          restartPolicy: Never
+          {{- with .Values.scheduler.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.scheduler.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}

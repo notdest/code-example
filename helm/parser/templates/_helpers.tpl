@@ -44,10 +44,30 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
 {{/*
+Common labels - worker
+*/}}
+{{- define "parser.labelsWorker" -}}
+helm.sh/chart: {{ include "parser.chart" . }}
+{{ include "parser.selectorLabelsWorker" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- end -}}
+
+{{/*
 Selector labels
 */}}
 {{- define "parser.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "parser.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end -}}
+
+{{/*
+Selector labels - worker
+*/}}
+{{- define "parser.selectorLabelsWorker" -}}
+app.kubernetes.io/name: {{ include "parser.name" . }}-worker
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 

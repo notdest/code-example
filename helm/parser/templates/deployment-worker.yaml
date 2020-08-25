@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "parser.fullname" . }}
+  name: {{ include "parser.fullname" . }}-worker
   labels:
-    {{- include "parser.labels" . | nindent 4 }}
+    {{- include "parser.labelsWorker" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "parser.selectorLabels" . | nindent 6 }}
+      {{- include "parser.selectorLabelsWorker" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "parser.selectorLabels" . | nindent 8 }}
+        {{- include "parser.selectorLabelsWorker" . | nindent 8 }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -27,10 +27,8 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: 80
-              protocol: TCP
+          command: ["./artisan"]
+          args: ["queue:listen"]
           envFrom:
             - configMapRef:
                 name: {{ include "parser.fullname" . }}
