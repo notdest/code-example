@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
 use Illuminate\Support\Facades\DB;
+use InstagramScraper\Exception\InstagramNotFoundException;
 use Phpfastcache\Helper\Psr16Adapter;
 use InstagramScraper\Instagram;
 
@@ -47,9 +48,16 @@ class parseInstagram implements ShouldQueue
                                             ->limit(5)
                                             ->pluck('postId')->all();
 
-            $posts  =   $instagram->getMedias($source->code);                           // скачиваем 20 постов
-            sleep(rand(1,3));
+            try {
+                $posts  =   $instagram->getMedias($source->code);                           // скачиваем 20 постов
+            }catch (InstagramNotFoundException $e){
+                fwrite(STDERR, "\n\n".
+                    "could not download: https://www.instagram.com/{$source->code}/\n".
+                    "command for deactivate: ./artisan Instagram:deactivate {$source->id}\n\n");
+                continue;
+            }
 
+            sleep(rand(1,3));
             $insertion  = [];
             foreach ($posts as $post){
                 if(in_array($post->getShortCode(),$localPosts)){                        // если уже сохраняли то пропускаем
@@ -58,6 +66,7 @@ class parseInstagram implements ShouldQueue
 
                 $newRow = [
                     'sourceId'      => $source->id,
+                    'numericalId'   => $post->getId(),
                     'postId'        => $post->getShortCode(),
                     'createdTime'   => date("Y-m-d H:i:s",$post->getCreatedTime()+(3*3600)),
                     'text'          => $post->getCaption(),
