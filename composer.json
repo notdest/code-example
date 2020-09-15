@@ -15,7 +15,7 @@
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
         "phpfastcache/phpfastcache": "^8.0",
-        "raiym/instagram-php-scraper": "^0.9.11"
+        "raiym/instagram-php-scraper": "dev-master#1aeaf4313c79416481e413bbd6a0c1b306565bed"
     },
     "require-dev": {
         "facade/ignition": "^2.0",
