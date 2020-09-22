@@ -16,9 +16,12 @@ build:
     - docker push ${DOCKER_REGISTRY}/parser:${VERSION}
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
+      when: always
     - if: $CI_COMMIT_REF_NAME =~ /^.+$/
       when: manual
+      allow_failure: true
     - when: never
+      allow_failure: true
   tags:
     - default
 
@@ -41,10 +44,12 @@ Deploy to gke:
     name: master
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
-      when: manual
+      when: on_success
     - if: $CI_COMMIT_REF_NAME =~ /^.+$/
       when: manual
+      allow_failure: true
     - when: never
+      allow_failure: true
   tags:
     - default
 
