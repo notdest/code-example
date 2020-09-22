@@ -15,6 +15,8 @@ build:
     - docker build -t ${DOCKER_REGISTRY}/parser:${VERSION} -f docker/Dockerfile .
     - docker push ${DOCKER_REGISTRY}/parser:${VERSION}
   rules:
+    - if: $CI_MERGE_REQUEST_IID
+      when: never
     - if: $CI_COMMIT_REF_NAME == "master"
       when: always
     - if: $CI_COMMIT_REF_NAME =~ /^.+$/
@@ -41,6 +43,8 @@ Deploy to gke:
   environment:
     name: master
   rules:
+    - if: $CI_MERGE_REQUEST_IID
+      when: never
     - if: $CI_COMMIT_REF_NAME == "master"
       when: on_success
     - if: $CI_COMMIT_REF_NAME =~ /^.+$/
