@@ -14,4 +14,5 @@ class PlatformController extends Controller
     public function list(){
         return view('platforms.list');
     }
+
 }
