@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "76d4142292c620cc2e41d1dee27adaef",
+    "content-hash": "dd7f0185660154c98895991bc14a337a",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -2124,12 +2124,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/postaddictme/instagram-php-scraper.git",
-                "reference": "1aeaf4313c79416481e413bbd6a0c1b306565bed"
+                "reference": "71b85009f514c2c71bad52c9e4b767c29fc373c2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/postaddictme/instagram-php-scraper/zipball/1aeaf4313c79416481e413bbd6a0c1b306565bed",
-                "reference": "1aeaf4313c79416481e413bbd6a0c1b306565bed",
+                "url": "https://api.github.com/repos/postaddictme/instagram-php-scraper/zipball/71b85009f514c2c71bad52c9e4b767c29fc373c2",
+                "reference": "71b85009f514c2c71bad52c9e4b767c29fc373c2",
                 "shasum": ""
             },
             "require": {
@@ -2165,7 +2165,7 @@
                 "instagram",
                 "scraper"
             ],
-            "time": "2020-09-03T20:19:11+00:00"
+            "time": "2020-09-17T12:13:29+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
