@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command("run:void parseInstagramQuik")  ->everyFiveMinutes();
+
+        $schedule->command("rss:import")                   ->dailyAt('8:00');
     }
 
     /**
