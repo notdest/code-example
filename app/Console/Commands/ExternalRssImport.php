@@ -41,14 +41,16 @@ class ExternalRssImport extends Command
             if (isset($xml['item'])) {
                 foreach ($xml['item'] as $itemXml) {
                     $itemArr = (array)$itemXml;
-                    if (isset($itemArr['title']) && !$this->itemExists($itemArr['title'])){
+                    if ($this->itemToSave($itemArr)){
                         $this->itemSave([
-                            'pub_date' => isset($itemArr['pubDate']) ? Carbon::parse($itemArr['pubDate'])->format('Y-m-d H:i:s') : null,
-                            'author' => isset($itemArr['author']) ? $itemArr['author'] : '',
-                            'title' => isset($itemArr['title']) ? $itemArr['title'] : '',
+                            'pub_date'    => isset($itemArr['pubDate']) ? Carbon::parse($itemArr['pubDate'])->format('Y-m-d H:i:s') : null,
+                            'author'      => isset($itemArr['author']) ? $itemArr['author'] : '',
+                            'title'       => isset($itemArr['title']) ? $itemArr['title'] : '',
                             'description' => isset($itemArr['description']) ? ($itemArr['description'] ?: $this->searchDescription($itemXml)) : '',
-                            'link' => isset($itemArr['link']) ? $itemArr['link'] : '',
-                            'category' => isset($itemArr['link']) ? (is_array($itemArr['category']) ? implode(', ', $itemArr['category']) : $itemArr['category']) : '',
+                            'link'        => isset($itemArr['link']) ? $itemArr['link'] : '',
+                            'category'    => isset($itemArr['link']) ? (is_array($itemArr['category']) ? implode(', ', $itemArr['category']) : $itemArr['category']) : '',
+                            'source'      => preg_replace('~(https:\/\/[a-z0-9\.]+\/)(.+)~', '$1', $url),
+                            'external_id' => isset($itemArr['guid']) ? $itemArr['guid'] : (isset($itemArr['link']) ? $itemArr['link'] : ''),
                         ]);
                     }
                 }
@@ -78,8 +80,25 @@ class ExternalRssImport extends Command
         return \DB::table('rss_imported')->insert($item);
     }
 
-    private function itemExists($title)
+    private function itemToSave($itemArr)
     {
-        return \DB::table('rss_imported')->where('title', $title)->first();
+        $query = \DB::table('rss_imported');
+
+        if (isset($itemArr['guid'])){
+            $query->where('external_id', $itemArr['guid']);
+            if (isset($itemArr['link'])){
+                $query->orWhere('external_id', $itemArr['link']);
+            }
+        } elseif (isset($itemArr['link'])){
+            $query->where('external_id', $itemArr['link']);
+        } else {
+            if (isset($itemArr['title'])) {
+                $query->where('title', $itemArr['title']);
+            } else {
+                return false; // пропускаем rss items без guid, link, title
+            }
+        }
+
+        return !(bool)$query->first();
     }
 }
