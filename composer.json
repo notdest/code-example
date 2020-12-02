@@ -11,11 +11,11 @@
         "php": "^7.2.5",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^1.0",
-        "guzzlehttp/guzzle": "^6.3",
+        "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^7.0",
         "laravel/tinker": "^2.0",
         "phpfastcache/phpfastcache": "^8.0",
-        "raiym/instagram-php-scraper": "dev-master#71b85009f514c2c71bad52c9e4b767c29fc373c2",
+        "raiym/instagram-php-scraper": "^0.10.0",
         "sentry/sentry-laravel": "^2.3"
     },
     "require-dev": {
