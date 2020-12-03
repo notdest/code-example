@@ -41,6 +41,8 @@ env:
   INSTAGRAM_LOGIN: "alexk7084"
   INSTAGRAM_PASSWORD: "imedia123"
 
+  SENTRY_LARAVEL_DSN: "https://91a86ed7f251403e8ed78b4039046dc4@sentry.fppressa.ru//4"
+
 db:
   migrations: true
 
