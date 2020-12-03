@@ -37,7 +37,7 @@ class parseInstagram implements ShouldQueue
     public function handle()
     {
         $config     = app('config')['common.instagram'];
-        $instagram  = Instagram::withCredentials($config->login, $config->password, new Psr16Adapter('Files'));
+        $instagram  = Instagram::withCredentials(new \GuzzleHttp\Client(),$config->login, $config->password, new Psr16Adapter('Files'));
         $instagram->login(); // по умолчанию ищет закешированную saveSession()
         $instagram->saveSession();
 
