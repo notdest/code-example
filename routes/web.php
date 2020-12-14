@@ -18,8 +18,11 @@ Route::get('/platforms/list',       'PlatformController@list');
 Route::get('/platforms/alphabet',   'PlatformController@alphabet');
 
 
-Route::get('/persons/',                 'PersonController@index');
-Route::get('/persons/delete/{id}/',   'PersonController@delete');
+Route::get('/persons/',             'PersonController@index');
+Route::get('/persons/delete/{id}/', 'PersonController@delete');
+
+Route::get('/articles/',            'ArticleController@index');
+Route::get('/articles/download/',   'ArticleController@download');
 
 
-Route::get('/',                 'PostController@index');
+Route::get('/',                     'PostController@index');
