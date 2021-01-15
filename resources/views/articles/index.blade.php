@@ -24,6 +24,16 @@
     </script>
     <form method="get" class="col-md-10">
         <div class="row">
+            @php
+                $streams = array_merge([ 0 =>'Все потоки'], \App\RssSource::$streams);
+            @endphp
+            <div class="col-2">
+                <select class="form-control form-control-dark" name="stream">
+                    @foreach ($streams as $k => $stream)
+                        <option {{ (($k === $search->stream) ? 'selected':'') }} value="{{$k}}">{{$stream}}</option>
+                    @endforeach
+                </select>
+            </div>
 
             <div class="col-2">
                 <input type="text" class="form-control form-control-dark" name="from" value="{!! $search->from !!}">
@@ -66,7 +76,7 @@
                 <tr>
                     <td><a href="{!! $article->link !!}" target="_blank">{{ $article->title }}</a></td>
                     <td>{{ $article->author }}</td>
-                    <td><a href="{!! $article->source !!}" target="_blank">{{ $article->source }}</a></td>
+                    <td>{{ $article->source->name }}</td>
                     <td>{{ $article->pub_date }}</td>
                     <td>
                         <div style="height: 40px; width: 400px"  class="overflow-hidden">

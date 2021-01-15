@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ExternalRssImport extends Command
 {
@@ -16,41 +17,13 @@ class ExternalRssImport extends Command
 
     public function handle()
     {
-        $rssList = [
-            'https://www.woman.ru/rss-feeds/rss.xml',
-            'https://www.wday.ru/rss-feeds/rss.xml',
-            'https://www.spletnik.ru/rss-anews/main',
-            'https://www.spletnik.ru/rss-yandex/main',
-            'https://7days.ru/rss/all/',
-            'https://www.passion.ru/rss.xml',
-            'https://www.wmj.ru/rss',
-            'https://woman.rambler.ru/rss/fashion/',
-            'https://woman.rambler.ru/rss/yandex/',
-            'https://aif.ru/rss/all.php',
-            'https://www.starhit.ru/rss/',
-            'https://teleprogramma.pro/ya-feed/',
-            'https://lenta.ru/rss',
-            'https://lifehacker.ru/feed/',
-            'https://www.iphones.ru/feed',
-            'https://www.factroom.ru/feed',
-            'https://www.ok-magazine.ru/rss.xml',
-            'https://www.psychologies.ru/rss/',
-            'https://www.marieclaire.ru/rss/yandex/',
-            'https://dni.ru/rss.xml',
-            'https://www.buro247.ru/xml/rss.xml',
-            'https://www.vogue.ru/feed/all-content/rss',
-            'https://www.elle.ru/rss/elle_ru/rss.xml',
-            'https://www.glamour.ru/rss/wifiru.xml',
-            'https://www.wonderzine.com/feeds/posts.atom',
-            'https://daily.afisha.ru/rss/',
-            'https://st.kp.yandex.net/rss/news.rss',
-            'https://www.film.ru/rss.xml',
-        ];
+        $sources = DB::select('SELECT * FROM `rss_sources`;');
+
 
         $httpClient = new \GuzzleHttp\Client();
 
-        foreach ($rssList as $url) {
-            $response = $httpClient->request('GET', $url);
+        foreach ($sources as $source ) {
+            $response = $httpClient->request('GET', $source->link);
 
             if ($response->getStatusCode() !== 200) continue;
 
@@ -66,12 +39,12 @@ class ExternalRssImport extends Command
                     if ($this->itemToSave($itemArr)){
                         $this->itemSave([
                             'pub_date'    => isset($itemArr['pubDate']) ? Carbon::parse($itemArr['pubDate'])->format('Y-m-d H:i:s') : null,
+                            'source_id'   => $source->id,
                             'author'      => isset($itemArr['author']) ? $itemArr['author'] : '',
                             'title'       => isset($itemArr['title']) ? $itemArr['title'] : '',
                             'description' => isset($itemArr['description']) ? ($itemArr['description'] ?: $this->searchDescription($itemXml)) : '',
                             'link'        => isset($itemArr['link']) ? $itemArr['link'] : '',
                             'category'    => isset($itemArr['category']) ? (is_array($itemArr['category']) ? implode(', ', $itemArr['category']) : $itemArr['category']) : '',
-                            'source'      => preg_replace('~(https:\/\/[a-z0-9\.]+\/)(.+)~', '$1', $url),
                             'external_id' => isset($itemArr['guid']) ? $itemArr['guid'] : (isset($itemArr['link']) ? $itemArr['link'] : ''),
                         ]);
                     }
