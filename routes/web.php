@@ -26,3 +26,5 @@ Route::get('/articles/download/',   'ArticleController@download');
 
 
 Route::get('/',                     'PostController@index');
+
+Auth::routes();
