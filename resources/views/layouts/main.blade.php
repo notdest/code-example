@@ -28,12 +28,7 @@
         @yield('search')
     @else
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
-
-        <ul class="navbar-nav px-3">
-            <li class="nav-item text-nowrap">
-                <a class="nav-link" href="#">Sign out</a>
-            </li>
-        </ul>
+        &nbsp; &nbsp; &nbsp;
     @endif
 </nav>
 
@@ -67,6 +62,15 @@
                     </li>
 
                 </ul>
+
+                @auth
+                    <div style="margin: 10px 0 0 20px">
+                        {{ Auth::user()->name }} ( <a href="#" onclick="document.getElementById('logout-form').submit();">Выйти</a> )
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+                    </div>
+                @endauth
 
             </div>
         </nav>
