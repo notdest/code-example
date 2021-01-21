@@ -24,6 +24,11 @@ Route::get('/persons/delete/{id}/', 'PersonController@delete');
 Route::get('/articles/',            'ArticleController@index');
 Route::get('/articles/download/',   'ArticleController@download');
 
+Route::get('/users/',               'UserController@index');
+Route::get('/users/create/',        'UserController@create');
+Route::post('/users/create/',       'UserController@store');
+Route::get('/users/edit/{id}/',     'UserController@edit');
+Route::post('/users/edit/{id}/',    'UserController@save');
 
 Route::get('/',                     'PostController@index');
 
