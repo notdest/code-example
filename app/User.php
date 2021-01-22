@@ -60,4 +60,24 @@ class User extends Authenticatable
         self::ROLE_EDITOR   => 'Редактор',
         self::ROLE_ADMIN    => 'Админ',
     ];
+
+    public function isAdmin(){
+        return ($this->role == self::ROLE_ADMIN) ;
+    }
+
+    public function isEditor(){
+        return ($this->role == self::ROLE_EDITOR) ;
+    }
+
+    public function isBlocked(){
+        return ($this->blocked > 0) ;
+    }
+
+    public function postsEnabled(){
+        return ($this->show_posts > 0);
+    }
+
+    public function articlesEnabled(){
+        return ($this->show_articles > 0);
+    }
 }

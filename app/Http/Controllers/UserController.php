@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -88,5 +89,17 @@ class UserController extends Controller
             'errors'    => $validator->errors(),
             'success'   => $success,
         ]);
+    }
+
+    public function defaultPage(){
+        if (Gate::allows('post-viewer')) {
+            return redirect('posts');
+        }
+
+        if (Gate::allows('article-viewer')) {
+            return redirect('articles');
+        }
+
+        return view('users.defaultPage');
     }
 }

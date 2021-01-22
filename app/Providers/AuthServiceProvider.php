@@ -25,6 +25,34 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        Gate::before(function ($user, $ability) {
+            if ($user->isBlocked()) {
+                return false;
+            }
+
+            if ($user->isAdmin()) {
+                return true;
+            }
+        });
+
+        Gate::define('admin', function ($user) {
+            return $user->isAdmin();
+        });
+
+        Gate::define('post-viewer', function ($user) {
+            return $user->postsEnabled();
+        });
+
+        Gate::define('post-editor', function ($user) {
+            return ($user->postsEnabled() && $user->isEditor());
+        });
+
+        Gate::define('article-viewer', function ($user) {
+            return $user->articlesEnabled();
+        });
+
+        Gate::define('article-editor', function ($user) {
+            return ($user->articlesEnabled() && $user->isEditor());
+        });
     }
 }

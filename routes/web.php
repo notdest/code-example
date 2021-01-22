@@ -13,23 +13,32 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::middleware(['auth', 'can:post-viewer'])->group(function () {
+    Route::get('/posts/',               'PostController@index');
 
-Route::get('/platforms/list',       'PlatformController@list');
-Route::get('/platforms/alphabet',   'PlatformController@alphabet');
+    Route::get('/platforms/list',       'PlatformController@list');
+    Route::get('/platforms/alphabet',   'PlatformController@alphabet');
 
+    Route::get('/persons/',             'PersonController@index');
+});
 
-Route::get('/persons/',             'PersonController@index');
-Route::get('/persons/delete/{id}/', 'PersonController@delete');
+Route::middleware(['auth', 'can:post-editor'])->group(function () {
+    Route::get('/persons/delete/{id}/', 'PersonController@delete');
+});
 
-Route::get('/articles/',            'ArticleController@index');
-Route::get('/articles/download/',   'ArticleController@download');
+Route::middleware(['auth', 'can:article-viewer'])->group(function () {
+    Route::get('/articles/',            'ArticleController@index');
+    Route::get('/articles/download/',   'ArticleController@download');
+});
 
-Route::get('/users/',               'UserController@index');
-Route::get('/users/create/',        'UserController@create');
-Route::post('/users/create/',       'UserController@store');
-Route::get('/users/edit/{id}/',     'UserController@edit');
-Route::post('/users/edit/{id}/',    'UserController@save');
+Route::middleware(['auth', 'can:admin'])->group(function () {
+    Route::get('/users/',               'UserController@index');
+    Route::get('/users/create/',        'UserController@create');
+    Route::post('/users/create/',       'UserController@store');
+    Route::get('/users/edit/{id}/',     'UserController@edit');
+    Route::post('/users/edit/{id}/',    'UserController@save');
+});
 
-Route::get('/',                     'PostController@index');
+Route::get('/', 'UserController@defaultPage')->middleware('auth');
 
-Auth::routes();
+Auth::routes(['register' => false,'reset' => false]);
