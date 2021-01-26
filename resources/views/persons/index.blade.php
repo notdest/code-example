@@ -25,7 +25,9 @@
                     <td>{{ $person->name }}</td>
                     <td>
                         <button type="button" class="btn btn-outline-info btn-sm">Редактировать</button>
-                        <a type="button" class="btn btn-outline-danger btn-sm" href="/persons/delete/{{ $person->id }}/">Удалить</a>
+                        @can("post-editor")
+                            <a type="button" class="btn btn-outline-danger btn-sm" href="/persons/delete/{{ $person->id }}/">Удалить</a>
+                        @endcan
                     </td>
                 </tr>
             @endforeach
