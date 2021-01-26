@@ -25,7 +25,10 @@
     <form method="get" class="col-md-10">
         <div class="row">
             @php
-                $streams = array_merge([ 0 =>'Все потоки'], \App\RssSource::$streams);
+                $streams = [ '0' =>'Все потоки'];
+                foreach (\App\RssSource::$streams as $k => $stream){
+                    $streams[$k]    = $stream;  // array_merge() теряет ключи
+                }
             @endphp
             <div class="col-2">
                 <select class="form-control form-control-dark" name="stream">
@@ -52,7 +55,7 @@
 
 @section('content')
     @php
-        $params  = http_build_query(['from' => $search->from,'to' => $search->to,])
+        $params  = http_build_query((Array) $search);
     @endphp
     <h2>Статьи</h2>
     <div class="clearfix mb-3"  >
