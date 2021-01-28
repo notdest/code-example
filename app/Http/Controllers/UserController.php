@@ -37,6 +37,10 @@ class UserController extends Controller
         ]);
 
         if($validator->passes()){
+            $fields['surname']      = $fields['surname']    ?: ''; // браузер null подставляет вместо пустой строки
+            $fields['name']         = $fields['name']       ?: '';
+            $fields['department']   = $fields['department'] ?: '';
+
             $fields['password'] = Hash::make($fields['password']);
             $user   = User::create($fields);
             return redirect('users/edit/'.$user->id)->with('success', true);
@@ -63,9 +67,12 @@ class UserController extends Controller
         $user       = User::findOrFail((int) $request->id);
 
         $fields     = $request->except('_token');
-        if($fields['password']==''){
+        if(!$fields['password']){
             unset($fields['password']);
         }
+        $fields['surname']      = $fields['surname']    ?: ''; // браузер null подставляет вместо пустой строки
+        $fields['name']         = $fields['name']       ?: '';
+        $fields['department']   = $fields['department'] ?: '';
         $user->fill($fields);
 
         $validator  = \Validator::make($fields,[

@@ -38,7 +38,7 @@
                 @auth
                     <div style="margin: 10px 0 0 20px">
                         {{ Auth::user()->name }} ( <a href="#" onclick="document.getElementById('logout-form').submit();">Выйти</a> )
-                        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        <form id="logout-form" action="/logout/" method="POST" class="d-none">
                             @csrf
                         </form>
                     </div>
