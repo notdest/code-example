@@ -17,6 +17,7 @@ class ExternalRssImport extends Command
 
     public function handle()
     {
+        set_time_limit ( 600 );
         $sources = DB::select('SELECT * FROM `rss_sources`;');
 
 
