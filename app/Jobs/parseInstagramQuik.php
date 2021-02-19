@@ -15,6 +15,8 @@ class parseInstagramQuik implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries   = 1;
+    public $timeout = 290; // если работает, то должно отработать раньше time_limit в 300 сек
     /**
      * Create a new job instance.
      *
@@ -32,6 +34,7 @@ class parseInstagramQuik implements ShouldQueue
      */
     public function handle()
     {
+        set_time_limit ( 300 );
         $config     = new \App\Configs\Instagram();
 
         if ($config->enabled == 0){
