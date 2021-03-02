@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8141b1d88dc8be67cd22c7493c83ea31",
+    "content-hash": "c4e8ba62f62109a36df21f55deefd5d6",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -3452,16 +3452,16 @@
         },
         {
             "name": "raiym/instagram-php-scraper",
-            "version": "dev-master",
+            "version": "v0.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/postaddictme/instagram-php-scraper.git",
-                "reference": "d919e8cb15e717aef45274ed1525c4c98e401811"
+                "reference": "c3de997d13f1b31c7bea47fbf0da463b26eaa228"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/postaddictme/instagram-php-scraper/zipball/d919e8cb15e717aef45274ed1525c4c98e401811",
-                "reference": "d919e8cb15e717aef45274ed1525c4c98e401811",
+                "url": "https://api.github.com/repos/postaddictme/instagram-php-scraper/zipball/c3de997d13f1b31c7bea47fbf0da463b26eaa228",
+                "reference": "c3de997d13f1b31c7bea47fbf0da463b26eaa228",
                 "shasum": ""
             },
             "require": {
@@ -3477,7 +3477,6 @@
                 "phpfastcache/phpfastcache": "^7.1",
                 "phpunit/phpunit": "^7.0"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -8878,9 +8877,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "raiym/instagram-php-scraper": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

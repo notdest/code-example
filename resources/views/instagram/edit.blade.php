@@ -33,6 +33,11 @@
         </div>
 
         <div class="form-group">
+            <label for="config_session" >{{ $config->fieldName('session') }}</label>
+            <input type="text" class="form-control" id="config_session" name="session" value="{{ $config->session }}">
+        </div>
+
+        <div class="form-group">
             <label for="config_enabled" >{{ $config->fieldName('enabled') }}</label>
 
             <div id="config_enabled">
