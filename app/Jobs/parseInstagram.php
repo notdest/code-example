@@ -51,8 +51,12 @@ class parseInstagram implements ShouldQueue
             new Psr16Adapter('Files')
         );
 
-        $instagram->login(); // по умолчанию ищет закешированную saveSession()
-        $instagram->saveSession();
+        if($config->session){
+            $instagram->loginWithSessionId($config->session);
+        }else {
+            $instagram->login(); // по умолчанию ищет закешированную saveSession()
+            $instagram->saveSession(86400);
+        }
 
         $sources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active` > 0;");
         foreach ($sources as $source) {                                                 //перебираем все активные аккаунты в инсте

@@ -50,8 +50,12 @@ class parseInstagramQuik implements ShouldQueue
             new Psr16Adapter('Files')
         );
 
-        $instagram->login(); // по умолчанию ищет закешированную saveSession()
-        $instagram->saveSession();
+        if($config->session){
+            $instagram->loginWithSessionId($config->session);
+        }else {
+            $instagram->login(); // по умолчанию ищет закешированную saveSession()
+            $instagram->saveSession(86400);
+        }
 
         $posts  = $instagram->getFeed();
 

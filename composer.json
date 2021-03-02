@@ -17,7 +17,7 @@
         "laravel/ui": "^2.5",
         "phpfastcache/phpfastcache": "^8.0",
         "phpoffice/phpspreadsheet": "^1.15",
-        "raiym/instagram-php-scraper": "dev-master#d919e8cb15e717aef45274ed1525c4c98e401811",
+        "raiym/instagram-php-scraper": "^0.11.1",
         "sentry/sentry-laravel": "^2.3"
     },
     "require-dev": {
