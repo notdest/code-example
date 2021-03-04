@@ -19,11 +19,9 @@ class ArticleController extends Controller
                                   ->where('pub_date','>=',$search->from )
                                   ->where('pub_date','<=',$search->to );
 
-        if($search->stream > 0){    //не нашел как сделать через связи, поэтому такой join
-            $sourceTable    = (new \App\RssSource())->getTable();
-            $articleTable   = (new \App\Article())->getTable();
-            $db = $db   ->join($sourceTable,$articleTable.'.source_id', '=', $sourceTable.'.id')
-                        ->where( \DB::raw("(`$sourceTable`.`stream` & ".intval($search->stream).")"),'>',0);
+        if($search->stream > 0){
+            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');;
+            $db  = $db->whereIn('source_id',$ids->toArray());
         }
 
         $articles   = $db->orderBy('pub_date', 'desc')
@@ -47,11 +45,9 @@ class ArticleController extends Controller
                                   ->where('pub_date','>=',$search->from )
                                   ->where('pub_date','<=',$search->to );
 
-        if($search->stream > 0){    //не нашел как сделать через связи, поэтому такой join
-            $sourceTable    = (new \App\RssSource())->getTable();
-            $articleTable   = (new \App\Article())->getTable();
-            $db = $db   ->join($sourceTable,$articleTable.'.source_id', '=', $sourceTable.'.id')
-                        ->where( \DB::raw("(`$sourceTable`.`stream` & ".intval($search->stream).")"),'>',0);
+        if($search->stream > 0){
+            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');;
+            $db  = $db->whereIn('source_id',$ids->toArray());
         }
 
         $articles   = $db->orderBy('pub_date', 'desc')
@@ -68,35 +64,29 @@ class ArticleController extends Controller
         $sheet  = $spreadsheet->setActiveSheetIndex(0);
 
         $sheet  ->setCellValue('A1', 'Заголовок')
-                ->setCellValue('B1', 'Автор')
-                ->setCellValue('C1', 'Источник')
-                ->setCellValue('D1', 'Дата публикации')
-                ->setCellValue('E1', 'Ссылка')
-                ->setCellValue('F1', 'Лид')
-                ->setCellValue('G1', 'Категория');
+                ->setCellValue('B1', 'Источник')
+                ->setCellValue('C1', 'Дата публикации')
+                ->setCellValue('D1', 'Ссылка')
+                ->setCellValue('E1', 'Категория');
 
         $sheet  ->getColumnDimension('A')->setWidth(70);
         $sheet  ->getColumnDimension('B')->setWidth(20);
         $sheet  ->getColumnDimension('C')->setWidth(20);
-        $sheet  ->getColumnDimension('D')->setWidth(20);
-        $sheet  ->getColumnDimension('E')->setWidth(25);
-        $sheet  ->getColumnDimension('F')->setWidth(30);
-        $sheet  ->getColumnDimension('G')->setWidth(20);
+        $sheet  ->getColumnDimension('D')->setWidth(25);
+        $sheet  ->getColumnDimension('E')->setWidth(20);
 
         foreach ($articles as $v => $article){
             $i  = $v+2;
             $sheet  ->setCellValue("A$i", $article->title)
-                    ->setCellValue("B$i", $article->author)
-                    ->setCellValue("C$i", $article->source->name);
+                    ->setCellValue("B$i", $article->source->name);
 
-            $sheet  ->setCellValue("D$i", $article->pub_date)
+            $sheet  ->setCellValue("C$i", $article->pub_date)
 
-                    ->setCellValue("E$i", $article->link)
-                    ->getCell("E$i")->getHyperlink()->setUrl($article->link)
+                    ->setCellValue("D$i", $article->link)
+                    ->getCell("D$i")->getHyperlink()->setUrl($article->link)
                     ->setTooltip('Перейти в статью');
 
-            $sheet  ->setCellValue("F$i", strip_tags($article->description))
-                    ->setCellValue("G$i", $article->category);
+            $sheet  ->setCellValue("E$i", $article->category);
         }
 
         $headers = [

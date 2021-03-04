@@ -37,6 +37,12 @@ class ExternalRssImport extends Command
             if (isset($xml['item'])) {
                 foreach ($xml['item'] as $itemXml) {
                     $itemArr = (array)$itemXml;
+
+                    $category   =  isset($itemArr['category']) ?
+                        (is_array($itemArr['category']) ? implode(', ', $itemArr['category']) : $itemArr['category']) : '';
+
+                    $category   = mb_substr($category,0,255,'UTF-8');
+
                     if ($this->itemToSave($itemArr)){
                         $this->itemSave([
                             'pub_date'    => isset($itemArr['pubDate']) ? Carbon::parse($itemArr['pubDate'])->format('Y-m-d H:i:s') : null,
@@ -45,7 +51,7 @@ class ExternalRssImport extends Command
                             'title'       => isset($itemArr['title']) ? $itemArr['title'] : '',
                             'description' => isset($itemArr['description']) ? ($itemArr['description'] ?: $this->searchDescription($itemXml)) : '',
                             'link'        => isset($itemArr['link']) ? $itemArr['link'] : '',
-                            'category'    => isset($itemArr['category']) ? (is_array($itemArr['category']) ? implode(', ', $itemArr['category']) : $itemArr['category']) : '',
+                            'category'    => $category,
                             'external_id' => isset($itemArr['guid']) ? $itemArr['guid'] : (isset($itemArr['link']) ? $itemArr['link'] : ''),
                         ]);
                     }

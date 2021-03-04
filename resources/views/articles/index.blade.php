@@ -67,10 +67,8 @@
             <thead class="thead-dark">
             <tr>
                 <th>Заголовок</th>
-                <th>Автор</th>
-                <th>Источник</th>
-                <th>Дата публикации</th>
-                <th>Лид</th>
+                <th style="width: 140px;">Источник</th>
+                <th style="width: 150px;">Дата публикации</th>
                 <th style="width: 165px;">Категория</th>
             </tr>
             </thead>
@@ -78,14 +76,8 @@
             @foreach ($articles as $article)
                 <tr>
                     <td><a href="{!! $article->link !!}" target="_blank">{{ $article->title }}</a></td>
-                    <td>{{ $article->author }}</td>
                     <td>{{ $article->source->name }}</td>
                     <td>{{ $article->pub_date }}</td>
-                    <td>
-                        <div style="height: 40px; width: 400px"  class="overflow-hidden">
-                            {{ mb_substr( strip_tags($article->description),0 ,150) }}
-                        </div>
-                    </td>
                     <td>{{ $article->category }}</td>
                 </tr>
             @endforeach
