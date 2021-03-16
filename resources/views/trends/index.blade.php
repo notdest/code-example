@@ -50,7 +50,7 @@
 @endsection
 
 @section('content')
-    <h2>Тренды</h2>
+    <h2>Google Trends</h2>
 
     @foreach ($trends as $trend)
 

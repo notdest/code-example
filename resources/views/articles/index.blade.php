@@ -57,7 +57,7 @@
     @php
         $params  = http_build_query((Array) $search);
     @endphp
-    <h2>Статьи</h2>
+    <h2>Статьи конкурентов</h2>
     <div class="clearfix mb-3"  >
         <a href="/articles/download/?{!!$params !!}"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
     </div>
