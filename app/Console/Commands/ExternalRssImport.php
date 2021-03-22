@@ -47,9 +47,7 @@ class ExternalRssImport extends Command
                         $this->itemSave([
                             'pub_date'    => isset($itemArr['pubDate']) ? Carbon::parse($itemArr['pubDate'])->format('Y-m-d H:i:s') : null,
                             'source_id'   => $source->id,
-                            'author'      => isset($itemArr['author']) ? $itemArr['author'] : '',
                             'title'       => isset($itemArr['title']) ? $itemArr['title'] : '',
-                            'description' => isset($itemArr['description']) ? ($itemArr['description'] ?: $this->searchDescription($itemXml)) : '',
                             'link'        => isset($itemArr['link']) ? $itemArr['link'] : '',
                             'category'    => $category,
                             'external_id' => isset($itemArr['guid']) ? $itemArr['guid'] : (isset($itemArr['link']) ? $itemArr['link'] : ''),
@@ -58,23 +56,6 @@ class ExternalRssImport extends Command
                 }
             }
         }
-    }
-
-    private function searchDescription($itemXml)
-    {
-        $description = '';
-
-        if ((string)$itemXml->content){
-            $description = (string)$itemXml->content;
-        } else {
-            $namespaces = $itemXml->getNameSpaces(true);
-            if (isset($namespaces['yandex'])) {
-                $yandex = $itemXml->children($namespaces['yandex']);
-                $description = (string)$yandex->{'full-text'} ?: '';
-            }
-        }
-
-        return $description;
     }
 
     private function itemSave($item)
