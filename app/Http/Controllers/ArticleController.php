@@ -9,23 +9,8 @@ class ArticleController extends Controller
 {
     //
     public function index(Request $request){
-
-        $search         = new \stdClass();
-        $search->stream = (int) $request->stream  ?? 0;
-        $search->from   = $request->from    ?? date('Y-m-d 00:00:00');
-        $search->to     = $request->to      ?? date('Y-m-d 23:59:59');
-
-        $db         = \App\Article::with('source')
-                                  ->where('pub_date','>=',$search->from )
-                                  ->where('pub_date','<=',$search->to );
-
-        if($search->stream > 0){
-            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');;
-            $db  = $db->whereIn('source_id',$ids->toArray());
-        }
-
-        $articles   = $db->orderBy('pub_date', 'desc')
-                         ->paginate(15);
+        $search   = $this->getSearch($request);
+        $articles = $this->getArticles($search,15);
 
         return view('articles.index',[
             'search'    => $search,
@@ -36,22 +21,8 @@ class ArticleController extends Controller
 
 
     public function download(Request $request){
-        $search         = new \stdClass();
-        $search->stream = (int) $request->stream  ?? 0;
-        $search->from   = $request->from    ?? date('Y-m-d 00:00:00');
-        $search->to     = $request->to      ?? date('Y-m-d 23:59:59');
-
-        $db         = \App\Article::with('source')
-                                  ->where('pub_date','>=',$search->from )
-                                  ->where('pub_date','<=',$search->to );
-
-        if($search->stream > 0){
-            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');;
-            $db  = $db->whereIn('source_id',$ids->toArray());
-        }
-
-        $articles   = $db->orderBy('pub_date', 'desc')
-                         ->get()->all();
+        $search   = $this->getSearch($request);
+        $articles = $this->getArticles($search);
 
 
         $spreadsheet = new Spreadsheet();
@@ -101,5 +72,37 @@ class ArticleController extends Controller
             "rss_".date('Y-m-d').".xlsx",
             $headers
         );
+    }
+
+
+
+    private function getArticles($search,$paginate = 0){
+        $db = \App\Article::with('source')
+                            ->where('pub_date','>=',$search->from )
+                            ->where('pub_date','<=',$search->to );
+
+        if($search->stream > 0){
+            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');;
+            $db  = $db->whereIn('source_id',$ids->toArray());
+        }
+
+        $db = $db->orderBy('pub_date', 'desc');
+
+        if($paginate){
+            $articles = $db->paginate(15);
+        }else{
+            $articles = $db->get()->all();
+        }
+
+        return $articles;
+    }
+
+    private function getSearch($request){
+        $search         = new \stdClass();
+        $search->stream = (int) $request->stream ?? 0;
+        $search->from   = $request->from         ?? date('Y-m-d 00:00:00');
+        $search->to     = $request->to           ?? date('Y-m-d 23:59:59');
+
+        return $search;
     }
 }
