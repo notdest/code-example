@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\{IOFactory,Spreadsheet};
+use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
@@ -75,14 +78,59 @@ class ArticleController extends Controller
     }
 
 
-
     private function getArticles($search,$paginate = 0){
+        if (strlen($search->searchQuery) > 0) {
+            return $this->getArticlesSphinx($search,$paginate);
+        }else{
+            return $this->getArticlesMysql($search,$paginate);
+        }
+    }
+
+    private function getArticlesSphinx($search,$paginate = 0){
+        $limit  = $paginate ?: 1000;
+        $page   = Paginator::resolveCurrentPage();
+        $offset = ($paginate) ? ($page - 1) * $limit : 0;
+
+        $from   = strtotime($search->from);
+        $to     = strtotime($search->to);
+
+        $sourceCond = '';
+        if($search->stream > 0){
+            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');
+            $sourceCond = 'AND source_id IN ('.implode(',',$ids->toArray()).') ';
+        }
+
+        $where  =   "MATCH( ? ) ".
+                    "AND pub_date >= $from ".
+                    "AND pub_date <= $to ".
+                    $sourceCond ;
+
+        $found  = DB::connection('sphinx')->select(
+                        "SELECT * FROM rss WHERE $where LIMIT $offset,$limit ;",
+                        [$search->searchQuery]);
+
+        $ids    = array_map(function ($v){return $v->id;},$found);
+
+        $articles = \App\Article::with('source')
+                                ->whereIn('id',$ids )->get();
+
+        if($paginate){
+            $count  = DB::connection('sphinx')
+                        ->select("SELECT COUNT(*) AS cnt FROM rss WHERE $where ;",[$search->searchQuery])[0]->cnt;
+            return new LengthAwarePaginator($articles,$count,$limit,$page,['path' => Paginator::resolveCurrentPath()]);
+        }else{
+            return $articles;
+        }
+    }
+
+    private function getArticlesMysql($search,$paginate = 0){
+
         $db = \App\Article::with('source')
                             ->where('pub_date','>=',$search->from )
                             ->where('pub_date','<=',$search->to );
 
         if($search->stream > 0){
-            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');;
+            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');
             $db  = $db->whereIn('source_id',$ids->toArray());
         }
 
@@ -102,6 +150,8 @@ class ArticleController extends Controller
         $search->stream = (int) $request->stream ?? 0;
         $search->from   = $request->from         ?? date('Y-m-d 00:00:00');
         $search->to     = $request->to           ?? date('Y-m-d 23:59:59');
+
+        $search->searchQuery  = (isset($request->searchQuery)) ? trim($request->searchQuery) : '';
 
         return $search;
     }
