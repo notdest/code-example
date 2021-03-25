@@ -43,6 +43,20 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
+        'sphinx' => [
+            'driver'            => 'mysql',
+            'host'              => env('SPHINX_HOST', '127.0.0.1'),
+            'port'              => env('SPHINX_PORT', '9306'),
+            'database'          => env('SPHINX_DATABASE', ''),
+            'username'          => env('SPHINX_USERNAME', ''),
+            'password'          => env('SPHINX_PASSWORD', ''),
+            'unix_socket'       => env('SPHINX_SOCKET', ''),
+            'charset'           => 'utf8',
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),

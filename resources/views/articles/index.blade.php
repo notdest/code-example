@@ -1,7 +1,12 @@
 
 @extends('layouts.main')
 
-@section('search')
+@section('content')
+    @php
+        $params  = http_build_query((Array) $search);
+    @endphp
+    <h2>Статьи конкурентов</h2>
+
     <script type="text/javascript">
         $( document ).ready(function() {
             $('input[name="from"]').daterangepicker({
@@ -23,7 +28,30 @@
         });
     </script>
     <form method="get" class="col-md-10">
-        <div class="row">
+        <div class="row mb-2">
+
+            <div class="col-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon1">С</span>
+                    </div>
+                    <input type="text" class="form-control" name="from"
+                           aria-label="С" aria-describedby="basic-addon1" value="{!! $search->from !!}">
+                </div>
+            </div>
+
+            <div class="col-2">
+                <div class="input-group input-group-sm">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="basic-addon2">По</span>
+                    </div>
+                    <input type="text" class="form-control" name="to"
+                           aria-label="По" aria-describedby="basic-addon2" value="{!! $search->to !!}">
+                </div>
+
+
+            </div>
+
             @php
                 $streams = [ '0' =>'Все потоки'];
                 foreach (\App\RssSource::$streams as $k => $stream){
@@ -31,33 +59,26 @@
                 }
             @endphp
             <div class="col-2">
-                <select class="form-control form-control-dark" name="stream">
+                <select class="form-control form-control-sm" name="stream">
                     @foreach ($streams as $k => $stream)
                         <option {{ (($k === $search->stream) ? 'selected':'') }} value="{{$k}}">{{$stream}}</option>
                     @endforeach
                 </select>
             </div>
+        </div>
+        <div class="row">
 
-            <div class="col-2">
-                <input type="text" class="form-control form-control-dark" name="from" value="{!! $search->from !!}">
-            </div>
-
-            <div class="col-2">
-                <input type="text" class="form-control form-control-dark" name="to" value="{!! $search->to !!}">
+            <div class="col-4">
+                <input type="text" class="form-control form-control-sm" name="searchQuery"
+                       placeholder="Поисковой запрос" value="{!! $search->searchQuery !!}">
             </div>
 
             <div class="col">
-                <input type="submit" value="Искать" class="btn btn-primary">
+                <input type="submit" value="Искать" class="btn btn-primary btn-sm">
             </div>
         </div>
     </form>
-@endsection
 
-@section('content')
-    @php
-        $params  = http_build_query((Array) $search);
-    @endphp
-    <h2>Статьи конкурентов</h2>
     <div class="clearfix mb-3"  >
         <a href="/articles/download/?{!!$params !!}"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
     </div>
