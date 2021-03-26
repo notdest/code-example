@@ -32,6 +32,7 @@ class ExternalRssImport extends Command
             $xml = simplexml_load_string($response->getBody()->getContents(), "SimpleXMLElement", LIBXML_NOCDATA);
             libxml_clear_errors();
 
+            if(!isset($xml->channel)) continue;     // TODO это отлетевший источник, надо сообщать о таком
             $xml = (array)$xml->channel;
 
             if (isset($xml['item'])) {
