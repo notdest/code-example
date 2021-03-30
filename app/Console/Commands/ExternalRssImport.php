@@ -22,40 +22,59 @@ class ExternalRssImport extends Command
 
 
         $httpClient = new \GuzzleHttp\Client();
+        $exceptions = [];
 
         foreach ($sources as $source ) {
-            $response = $httpClient->request('GET', $source->link);
+            try {
+                $response = $httpClient->request('GET', $source->link);
 
-            if ($response->getStatusCode() !== 200) continue;
+                libxml_use_internal_errors(true);
+                $xml = simplexml_load_string($response->getBody()->getContents(), "SimpleXMLElement", LIBXML_NOCDATA);
+                libxml_clear_errors();  // ошибки типо неизвестного неймспейса, поэтому игнорируем
+                                        // если не спарсится, то где-то дальше вылетит
 
-            libxml_use_internal_errors(true);
-            $xml = simplexml_load_string($response->getBody()->getContents(), "SimpleXMLElement", LIBXML_NOCDATA);
-            libxml_clear_errors();
+                if(isset($xml->channel->item)){     // TODO: убрать этот костыль, один канал мы точно пропускаем
+                    $items  = $xml->channel->item;
+                }else{
+                    continue;
+                }
+            } catch (\Throwable $e) {
+                $exceptions[]   = $e;
+                continue;
+            }
 
-            if(!isset($xml->channel)) continue;     // TODO это отлетевший источник, надо сообщать о таком
-            $xml = (array)$xml->channel;
 
-            if (isset($xml['item'])) {
-                foreach ($xml['item'] as $itemXml) {
-                    $itemArr = (array)$itemXml;
-
-                    $category   =  isset($itemArr['category']) ?
-                        (is_array($itemArr['category']) ? implode(', ', $itemArr['category']) : $itemArr['category']) : '';
+            foreach ($items as $item) {
+                try {
+                    $category   =  isset($item->category) ?
+                        (is_array($item->category) ? implode(', ', $item->category) : $item->category) : '';
 
                     $category   = mb_substr($category,0,255,'UTF-8');
 
-                    if ($this->itemToSave($itemArr)){
+                    if ($this->itemToSave($item)){
                         $this->itemSave([
-                            'pub_date'    => isset($itemArr['pubDate']) ? Carbon::parse($itemArr['pubDate'])->format('Y-m-d H:i:s') : null,
+                            'pub_date'    => isset($item->pubDate) ? Carbon::parse($item->pubDate)->format('Y-m-d H:i:s') : null,
                             'source_id'   => $source->id,
-                            'title'       => isset($itemArr['title']) ? $itemArr['title'] : '',
-                            'link'        => isset($itemArr['link']) ? $itemArr['link'] : '',
+                            'title'       => $item->title ?? '',
+                            'link'        => $item->link  ?? '',
                             'category'    => $category,
-                            'external_id' => isset($itemArr['guid']) ? $itemArr['guid'] : (isset($itemArr['link']) ? $itemArr['link'] : ''),
+                            'external_id' => $item->guid  ?? ($item->link ?? ''),
                         ]);
+                    }
+                } catch (\Throwable $e) {
+                    $exceptions[]   = $e;
+
+                    if(count($exceptions)>10){      // много ошибок, что-то поменялось в фиде
+                        continue 2;
+                    }else{
+                        continue;
                     }
                 }
             }
+        }
+
+        foreach ($exceptions as $exception) {   // когда отработали сообщаем об ошибках в логгер
+            throw $exception;
         }
     }
 
@@ -64,8 +83,10 @@ class ExternalRssImport extends Command
         return \DB::table('rss_imported')->insert($item);
     }
 
-    private function itemToSave($itemArr)
+    private function itemToSave($item)
     {
+        $itemArr = (array) $item;               // Todo: переписать без приведения к массиву, так будет читаемей
+                                                // вообще это дублирование кода, мы то же самое делаем при записи
         $query = \DB::table('rss_imported');
 
         if (isset($itemArr['guid'])){
