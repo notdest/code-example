@@ -57,7 +57,7 @@ class ExternalRssImport extends Command
                             'source_id'   => $source->id,
                             'title'       => $item->title ?? '',
                             'link'        => $item->link  ?? '',
-                            'category'    => $category,
+                            'unknown_categories' => $category,
                             'external_id' => $item->guid  ?? ($item->link ?? ''),
                         ]);
                     }
