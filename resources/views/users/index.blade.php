@@ -28,7 +28,7 @@
             @foreach ($users as $user)
                 <tr>
                     <td>{{ $user->id }}</td>
-                    <td><a href="/users/edit/{!! $user->id !!}/">{{ $user->email }}</td>
+                    <td><a href="/users/edit/{!! $user->id !!}/">{{ $user->email }}</a></td>
                     <td>{{ $user->surname }}</td>
                     <td>{{ $user->name }}</td>
                     <td>
