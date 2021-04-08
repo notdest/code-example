@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\RssCategory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ class ExternalRssImport extends Command
         set_time_limit ( 600 );
         $sources = DB::select('SELECT * FROM `rss_sources`;');
 
+        $classifier = RssCategory::getClassifier();
 
         $httpClient = new \GuzzleHttp\Client();
         $exceptions = [];
@@ -46,10 +48,13 @@ class ExternalRssImport extends Command
 
             foreach ($items as $item) {
                 try {
-                    $category   =  isset($item->category) ?
-                        (is_array($item->category) ? implode(', ', $item->category) : $item->category) : '';
-
-                    $category   = mb_substr($category,0,255,'UTF-8');
+                    if(isset($item->category)){
+                        $unknown = (is_array($item->category)) ? $item->category : [$item->category];
+                        list($categories,$unknown)  = $classifier($source->id,$unknown);
+                    }else{
+                        $categories = 0;
+                        $unknown    = [];
+                    }
 
                     if ($this->itemToSave($item)){
                         $this->itemSave([
@@ -57,7 +62,8 @@ class ExternalRssImport extends Command
                             'source_id'   => $source->id,
                             'title'       => $item->title ?? '',
                             'link'        => $item->link  ?? '',
-                            'unknown_categories' => $category,
+                            'categories'  =>  $categories,
+                            'unknown_categories' => mb_substr( implode(', ',$unknown) ,0,255,'UTF-8'),
                             'external_id' => $item->guid  ?? ($item->link ?? ''),
                         ]);
                     }
