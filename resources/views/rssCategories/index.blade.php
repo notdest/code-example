@@ -23,9 +23,9 @@
             <thead class="thead-dark">
             <tr>
                 <th style="min-width: 3em;">Id</th>
-                <th style="min-width: 9em;">Источник</th>
+                <th style="min-width: 12em;">Источник</th>
                 <th width="100%">Их категория</th>
-                <th style="min-width: 8em;">Наш аналог</th>
+                <th style="min-width: 12em;">Наш аналог</th>
                 <th></th>
             </tr>
             </thead>
