@@ -1,6 +1,28 @@
 @extends('layouts.main')
 
 
+@section('search')
+@php
+$options    = [ 0 => " Выбрать источник "] + $sources ;
+@endphp
+<form method="get" class="col-md-10">
+    <div class="row">
+        <div class="col-2">
+            <select name="source" class="form-control form-control-dark">
+                @foreach($options as $k => $option)
+                    <option value="{{$k}}" {{ ($search->source == $k ) ? "selected" : "" }}>{{$option}}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="col">
+            <input type="submit" value="Искать" class="btn btn-primary">
+        </div>
+    </div>
+</form>
+@endsection
+
+
 @section('content')
     @php
         $categorySelect[0]  = ' ';

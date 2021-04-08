@@ -4,38 +4,50 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\RssCategory;
+use Illuminate\Support\Facades\DB;
 
 class RssCategoryController extends Controller
 {
 
-    public function index(){
+    public function index(Request $request){
+        $search         = new \stdClass();
+        $search->source = (int) $request->source ?? 0;
 
-        $categories = RssCategory::with('source')->orderBy('sourceId','desc')->orderBy('id','desc')->paginate(20);
+        $categories = RssCategory::with('source');
+        if($search->source > 0){
+            $categories = $categories->where('sourceId','=',$search->source);
+        }else{
+            $categories = $categories ->orderBy('sourceId','desc');
+        }
+        $categories = $categories->orderBy('id','desc')->paginate(20);
 
         $articles   = \App\Article::with('source')
                                   ->whereRaw('LENGTH(`unknown_categories`) > 0')
-                                  ->orderBy('id','desc')
-                                  ->limit(20)->get();
+                                  ->orderBy('id','desc');
+        if($search->source > 0){
+            $articles   = $articles->where('source_id','=',$search->source);
+        }
+        $articles   = $articles->limit(20)->get();
 
         $unknowns   = [];                                           // получаем неопознанные категории из статей
-        $sources    = [];
         foreach ($articles as $article) {
             $ucats  = explode(', ',$article->unknown_categories);
             foreach ($ucats as $ucat) {
                 $unknowns[$article->source->id][]   = trim($ucat);
-                $sources[ $article->source->id ]    = $article->source->name;
             }
         }
-
         foreach ($unknowns as $k => $unknown) {
             $unknowns[$k]  = array_unique($unknown);
         }
+
+        $sources = DB::table('rss_sources')->pluck('name', 'id')->toArray();
 
         return view('rssCategories.index',[
             'categories'    => $categories,
             'articles'      => $articles,
             'unknowns'      => $unknowns,
             'sources'       => $sources,
+            'search'        => $search,
         ]);
     }
 
