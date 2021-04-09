@@ -73,6 +73,18 @@
                        placeholder="Поисковой запрос" value="{!! $search->searchQuery !!}">
             </div>
 
+            <div class="col-2">
+                @php
+                    $categories  = [ 0 => ' Все категории '];
+                    $categories  = $categories + \App\Article::$categories ;
+                @endphp
+                <select class="form-control form-control-sm" name="category">
+                    @foreach ($categories as $k => $category)
+                        <option {{ (($k === $search->category) ? 'selected':'') }} value="{{$k}}">{{$category}}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="col">
                 <input type="submit" value="Искать" class="btn btn-primary btn-sm">
             </div>

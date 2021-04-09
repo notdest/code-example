@@ -100,10 +100,16 @@ class ArticleController extends Controller
             $sourceCond = 'AND source_id IN ('.implode(',',$ids->toArray()).') ';
         }
 
+        $categoryCond = '';
+        if($search->category > 0){
+            $categoryCond = "AND categories = {$search->category} ";
+        }
+
         $where  =   "MATCH( ? ) ".
                     "AND pub_date >= $from ".
                     "AND pub_date <= $to ".
-                    $sourceCond ;
+                    $sourceCond .
+                    $categoryCond;
 
         $found  = DB::connection('sphinx')->select(
                         "SELECT * FROM rss WHERE $where LIMIT $offset,$limit ;",
@@ -134,6 +140,10 @@ class ArticleController extends Controller
             $db  = $db->whereIn('source_id',$ids->toArray());
         }
 
+        if($search->category){
+            $db  = $db->where( \DB::raw("(`categories` & ".intval($search->category).")") ,'>', 0);
+        }
+
         $db = $db->orderBy('pub_date', 'desc');
 
         if($paginate){
@@ -146,10 +156,11 @@ class ArticleController extends Controller
     }
 
     private function getSearch($request){
-        $search         = new \stdClass();
-        $search->stream = (int) $request->stream ?? 0;
-        $search->from   = $request->from         ?? date('Y-m-d 00:00:00');
-        $search->to     = $request->to           ?? date('Y-m-d 23:59:59');
+        $search             = new \stdClass();
+        $search->stream     = (int) $request->stream        ?? 0;
+        $search->category   = (int) $request->category      ?? 0;
+        $search->from       = $request->from                ?? date('Y-m-d 00:00:00');
+        $search->to         = $request->to                  ?? date('Y-m-d 23:59:59');
 
         $search->searchQuery  = (isset($request->searchQuery)) ? trim($request->searchQuery) : '';
 
