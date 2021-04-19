@@ -40,6 +40,10 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
 
     Route::get( '/instagram/edit/',     'InstagramController@edit');
     Route::post('/instagram/edit/',     'InstagramController@save');
+
+    Route::get( '/rss-category/',               'RssCategoryController@index');
+    Route::get( '/rss-category/delete/{id}/',   'RssCategoryController@delete');
+    Route::post('/rss-category/write/',         'RssCategoryController@write');
 });
 
 Route::get('/', 'UserController@defaultPage')->middleware('auth');
