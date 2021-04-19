@@ -31,13 +31,15 @@ class parseTrends implements ShouldQueue
             foreach ($feed->channel->item as $item) {
                 $data       = $item->children('ht', true);
                 $pubDate    = strtotime($item->pubDate);
+                $traffic    = (int) str_replace([',','+'],'',$data->approx_traffic);
 
                 Trend::updateOrCreate([
                     'pubDate'   => date("Y-m-d H:i:s",$pubDate),
                     'title'     => $item->title,
                     'feed'      => $feedLang,
                 ],[
-                    'data' => json_encode($data,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    'data'      => json_encode($data,JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                    'traffic'   => $traffic,
                 ]);
             }
         }
