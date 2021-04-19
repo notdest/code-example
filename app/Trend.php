@@ -24,12 +24,6 @@ class Trend extends Model
 
     protected $fillable     = ['pubDate', 'title', 'feed', 'data', 'traffic'];
 
-
-    public function getTrafficAttribute(){
-        $data   = json_decode($this->data);
-        return (isset($data->approx_traffic)) ? (int) str_replace([',','+'],'',$data->approx_traffic) : 0;
-    }
-
     public function getNewsAttribute(){
         $data   = json_decode($this->data);
         $news   = $data->news_item ?? [];
