@@ -19,13 +19,10 @@ class Trend extends Model
         self::FEED_US   => 'Соединенные штаты',
     ];
 
-    protected $fillable     = ['pubDate', 'title', 'feed', 'data'];
+    const SORTING_DATE      = 0;
+    const SORTING_TRAFFIC   = 1;
 
-
-    public function getTrafficAttribute(){
-        $data   = json_decode($this->data);
-        return (isset($data->approx_traffic)) ? (int) str_replace([',','+'],'',$data->approx_traffic) : 0;
-    }
+    protected $fillable     = ['pubDate', 'title', 'feed', 'data', 'traffic'];
 
     public function getNewsAttribute(){
         $data   = json_decode($this->data);

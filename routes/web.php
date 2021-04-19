@@ -44,5 +44,6 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
 
 Route::get('/', 'UserController@defaultPage')->middleware('auth');
 Route::get('/trends/',                  'TrendController@index');
+Route::get('/trends/download/',         'TrendController@download');
 
 Auth::routes(['register' => false,'reset' => false]);

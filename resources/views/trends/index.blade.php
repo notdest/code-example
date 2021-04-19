@@ -4,7 +4,7 @@
 @section('search')
     <script type="text/javascript">
         $( document ).ready(function() {
-            $('input[name="from"]').daterangepicker({
+            $('input[name="from"][type="text"]').daterangepicker({
                 singleDatePicker: true ,
                 timePicker: true,
                 timePicker24Hour: true,
@@ -12,7 +12,7 @@
                     format: 'YYYY-MM-DD HH:mm:ss'
                 }
             });
-            $('input[name="to"]').daterangepicker({
+            $('input[name="to"][type="text"]').daterangepicker({
                 singleDatePicker: true ,
                 timePicker: true,
                 timePicker24Hour: true,
@@ -46,11 +46,45 @@
                 <input type="submit" value="Искать" class="btn btn-primary">
             </div>
         </div>
+        <input type="hidden" name="sorting" value="{{ $search->sorting }}">
     </form>
 @endsection
 
 @section('content')
+    @php
+        $params  = http_build_query((Array) $search);
+    @endphp
     <h2>Google Trends</h2>
+
+        <div class="row mb-2">
+            <div class="col-1 pl-4 border-bottom" style="line-height: 1.8em; font-weight: bold; font-size: 1.2em;">
+                Сортировать
+            </div>
+            <div class="col-4 border-bottom">
+                <form method="get">
+                    @foreach($search as $name => $value)
+                        @if($name !== "sorting")
+                            <input type="hidden" name="{{$name}}" value="{{$value}}">
+                        @endif
+                    @endforeach
+                    <div class="btn-group btn-group-toggle btn-group-sm" data-toggle="buttons">
+                        <label class="btn btn-secondary active">
+                            <input type="radio" name="sorting" autocomplete="off" onchange="$(this).parents('form').submit()"
+                                    {{ ($search->sorting === \App\Trend::SORTING_DATE) ? "checked" : "" }}
+                                    value="{{\App\Trend::SORTING_DATE}}">По дате
+                        </label>
+                        <label class="btn btn-secondary">
+                            <input type="radio" name="sorting" autocomplete="off" onchange="$(this).parents('form').submit()"
+                                    {{ ($search->sorting === \App\Trend::SORTING_TRAFFIC) ? "checked" : ""}}
+                                    value="{{\App\Trend::SORTING_TRAFFIC}}">По запросам
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="col-2 border-bottom pb-2">
+                <a href="/trends/download/?{!!$params !!}"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
+            </div>
+        </div>
 
     @foreach ($trends as $trend)
 
@@ -80,6 +114,5 @@
     </div>
 
     @endforeach
-
-    {{ $trends->withQueryString()->links() }}
+<br><br><br>
 @endsection
