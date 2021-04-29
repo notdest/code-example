@@ -35,11 +35,13 @@ class PostController extends Controller
 
         $posts  = $posts->paginate(15);
 
+        $config = new \App\Configs\Instagram();
 
         return view('posts.index',[
             'posts'     => $posts,
             'persons'   => $persons,
             'search'    => $search,
+            'enabled'   => $config->enabled,
         ]);
     }
 }

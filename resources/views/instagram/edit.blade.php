@@ -57,6 +57,12 @@
             <input type="text" class="form-control" id="config_proxy" name="proxy" value="{{ $config->proxy }}">
         </div>
 
+        <div class="form-group">
+            <label for="config_emails" >{{ $config->fieldName('emails') }}</label>
+            <input type="text" class="form-control" id="config_emails" name="emails" value="{{ $config->emails }}" placeholder="Имя1|adress1@mail.ru,Имя2|adress2@mail.ru">
+            <a href="/instagram/check-email/">Выслать проверочные E-mail</a> (нажимать после сохранения)
+        </div>
+
         @csrf
         <input type="submit" value="Сохранить" class="btn btn-success">
     </form>

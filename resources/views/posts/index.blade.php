@@ -60,14 +60,14 @@
 
 @section('content')
 
-    <h2>Посты</h2>
+    <h2>Посты{{ $enabled ? '' : " (Выключен)" }}</h2>
 
     <div class="row">
 
         @foreach ($posts as $post)
             <div class="col-md-5 col-lg-3 col-12 m-2 card" style="max-height: 600px;">
                 <a href="https://www.instagram.com/p/{!! $post->postId !!}/" target="_blank">
-                    <img class="card-img-top" src="{!! $post->image !!}" >
+                    <img class="card-img-top" src="{!! $post->image !!}" style="max-height: 400px;object-fit: contain;">
                 </a>
                 <h5 class="card-title mt-2">{{ $post->name }}
                     <a href="https://www.instagram.com/{!! $post->code !!}/"  target="_blank">
