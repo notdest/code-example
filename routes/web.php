@@ -38,8 +38,9 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::get('/users/edit/{id}/',     'UserController@edit');
     Route::post('/users/edit/{id}/',    'UserController@save');
 
-    Route::get( '/instagram/edit/',     'InstagramController@edit');
-    Route::post('/instagram/edit/',     'InstagramController@save');
+    Route::get( '/instagram/edit/',         'InstagramController@edit');
+    Route::post('/instagram/edit/',         'InstagramController@save');
+    Route::get( '/instagram/check-email/',  'InstagramController@checkEmail');
 
     Route::get( '/rss-category/',               'RssCategoryController@index');
     Route::get( '/rss-category/delete/{id}/',   'RssCategoryController@delete');
