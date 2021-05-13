@@ -32,6 +32,9 @@ RUN chmod -R a+rw /app
 
 FROM eu.gcr.io/feshn-press-llc/nginx-fpm:1.17.9-7.4-1
 
+RUN apk add --no-cache ca-certificates fuse && rm -rf /tmp/*
+COPY docker/bin/gcsfuse /usr/local/bin
+
 # Set working directory
 WORKDIR /var/www
 
@@ -44,6 +47,7 @@ COPY --from=builder --chown=www-data:www-data /app/resources/ /var/www/resources
 COPY --from=builder --chown=www-data:www-data /app/vendor/ /var/www/vendor/
 COPY --from=builder --chown=www-data:www-data /app/public/ /var/www/public/
 COPY --from=builder --chown=www-data:www-data /app/storage/ /var/www/storage/
+RUN mkdir -p /var/www/public/img_cache
 
 
 

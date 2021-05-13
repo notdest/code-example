@@ -49,6 +49,8 @@ env:
 
   SENTRY_LARAVEL_DSN: "https://91a86ed7f251403e8ed78b4039046dc4@sentry.fppressa.ru//4"
 
+  IMAGE_BUCKER: im-parser
+
 db:
   migrations: true
 
@@ -63,17 +65,21 @@ scheduler:
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: true
+  create: false
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name:
+  name: parser-sa
 
 podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  privileged: true
+  capabilities:
+    add:
+      - SYS_ADMIN
   # capabilities:
   #   drop:
   #   - ALL
