@@ -2,18 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Mail\InstagramSessionExpired;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use InstagramScraper\Instagram;
-use Phpfastcache\Helper\Psr16Adapter;
 
-class parseInstagramQuik implements ShouldQueue
+class parseInstagramQuick implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -43,32 +40,8 @@ class parseInstagramQuik implements ShouldQueue
             return;
         }
 
-        $httpConfig = $config->proxy ? ['proxy' => $config->proxy] : [];
-
-        try {
-            $instagram = Instagram::withCredentials(
-                new \GuzzleHttp\Client($httpConfig),
-                $config->login,
-                $config->password,
-                new Psr16Adapter('Files')
-            );
-
-            if ($config->session) {
-                $instagram->loginWithSessionId($config->session);
-            } else {
-                $instagram->login(); // по умолчанию ищет закешированную saveSession()
-                $instagram->saveSession(86400);
-            }
-
-            $posts = $instagram->getFeed();
-        }catch (\Exception $e){     // не обязательно будет InstagramAuthException
-            if($config->tooMuchErrors()){
-                Mail::to( $config->getEmails() )->send(new InstagramSessionExpired());
-            }
-            throw $e;
-            return;
-        }
-
+        $instagram  = $config->getClient();
+        $posts      = $instagram->getFeed();
 
         $usernames  = $controlUsernames = $ids = [];
         foreach ($posts as $k => $post){
@@ -138,5 +111,11 @@ class parseInstagramQuik implements ShouldQueue
 
         DB::table('posts')->insert( $insertion );
         $config->dropErrors();
+
+        if(($config->enableSubscription > 0) && ($config->lastSubscribe < strtotime('-1 hour'))){
+            $config->lastSubscribe = time();
+            $config->save();
+            Artisan::call('Instagram:subscribe', [ 'limit' => 4 ]);
+        }
     }
 }

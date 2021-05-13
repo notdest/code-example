@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InstagramSessionExpired;
+use InstagramScraper\Exception\InstagramException;
 
 
 class InstagramController extends Controller
@@ -63,4 +65,37 @@ class InstagramController extends Controller
         return back();
     }
 
+    public function checkSubscribed(){
+        $config     = new \App\Configs\Instagram();
+
+        if ($config->enabled == 0){
+            return "Парсер выключен";
+        }
+
+        $instagram  = $config->getClient();
+        sleep(2);
+
+        $account    = $instagram->getAccount($config->login);
+        sleep(1);
+
+        try {
+            $subscribed = $instagram->getFollowing($account->getId(),500);  // решил, что 500 подписок достаточно
+        }catch (InstagramException $e){
+            return "Не смог получить подписки";
+        }
+
+        $usernames   = array_map(function ($v){ return $v['username'];},$subscribed['accounts'] );
+
+        $sources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active` > 0;");
+
+        $unsubscribed = [];
+        foreach ($sources as $source){
+            if(!in_array($source->code,$usernames)){
+                $unsubscribed[]   = $source->code;
+            }
+        }
+
+        $config->dropErrors();
+        return "Не подписано ".count($unsubscribed)." из ".count($sources)." персон(обрабатываем <= 500)";
+    }
 }

@@ -63,6 +63,37 @@
             <a href="/instagram/check-email/">Выслать проверочные E-mail</a> (нажимать после сохранения)
         </div>
 
+        <script type="text/javascript">
+            function checkSubscribed(){
+                $("#subscribedButton").attr('disabled','disabled');
+                $.get( "/instagram/check-subscribed/", function( data ) {
+                    $("#subscribedButton").removeAttr('disabled');
+                    $( "#subscribedCount" ).text(data);
+                });
+            }
+        </script>
+        <div class="form-group">
+            <button type="button" class="btn btn-dark" onclick="checkSubscribed();" id="subscribedButton">
+                Проверить количество подписанных
+            </button>
+            <span id="subscribedCount" class="ml-3">..... из .....</span>
+        </div>
+
+        <div class="form-group">
+            <label for="config_enableSubscription" >{{ $config->fieldName('enableSubscription') }}</label>
+
+            <div id="config_enableSubscription">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="enableSubscription" id="config_enableSubscription1" value="0" {{ ($config->enableSubscription == 0) ? 'checked':'' }}>
+                    <span>Выключен</span>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="enableSubscription" id="config_enableSubscription2" value="1" {{ ($config->enableSubscription != 0) ? 'checked':'' }}>
+                    <span>Включен</span>
+                </div>
+            </div>
+        </div>
+
         @csrf
         <input type="submit" value="Сохранить" class="btn btn-success">
     </form>

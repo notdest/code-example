@@ -5,8 +5,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use InstagramScraper\Exception\{InstagramNotFoundException,InstagramException};
-use InstagramScraper\Instagram;
-use Phpfastcache\Helper\Psr16Adapter;
 
 class subscribeInstagram extends Command
 {
@@ -49,21 +47,7 @@ class subscribeInstagram extends Command
             return 0;
         }
 
-        $httpConfig = $config->proxy ? ['proxy' => $config->proxy] : [];
-
-        $instagram  = Instagram::withCredentials(
-            new \GuzzleHttp\Client($httpConfig),
-            $config->login,
-            $config->password,
-            new Psr16Adapter('Files')
-        );
-
-        if($config->session){
-            $instagram->loginWithSessionId($config->session);
-        }else {
-            $instagram->login(); // по умолчанию ищет закешированную saveSession()
-            $instagram->saveSession(86400);
-        }
+        $instagram  = $config->getClient();
         sleep(2);
 
         $account    = $instagram->getAccount($config->login);
@@ -90,6 +74,7 @@ class subscribeInstagram extends Command
 
                 if ($i >= $limit){
                     echo "\n\nlimit reached: $limit\n";
+                    $config->dropErrors();
                     return 0;
                 }
 
@@ -100,8 +85,7 @@ class subscribeInstagram extends Command
                     sleep(rand(1,5));
                     $i++;
                 }catch (InstagramNotFoundException $e){
-                    $this->err( "could not download: https://www.instagram.com/{$source->code}/\n".
-                                "command for deactivate: ./artisan Instagram:deactivate $source->id");
+                    $this->call('Instagram:deactivate', [ 'id' => $source->id ]);
                 }catch (InstagramException $e){
                     $this->err( "Unknown error: https://www.instagram.com/{$source->code}/\n".
                                 "command for deactivate: ./artisan Instagram:deactivate $source->id");
@@ -109,6 +93,10 @@ class subscribeInstagram extends Command
                 }
             }
         }
+
+        $config->dropErrors();
+        $config->enableSubscription = 0;        // если мы не достигли лимита и оказались здесь
+        $config->save();                        // то можно выключать парсинг
 
         return 0;
     }
