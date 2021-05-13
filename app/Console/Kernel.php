@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command("run:void parseInstagramQuik")  ->everyFiveMinutes()->withoutOverlapping(120);
+        $schedule->command("run:void parseInstagramQuick") ->everyFiveMinutes()->withoutOverlapping(120);
         $schedule->command("run:void parseTrends")         ->hourlyAt(2)->withoutOverlapping(120);
 
         $schedule->command("rss:import")                   ->everyFifteenMinutes()->withoutOverlapping(120);

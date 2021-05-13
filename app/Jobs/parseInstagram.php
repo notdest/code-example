@@ -10,8 +10,6 @@ use Illuminate\Queue\SerializesModels;
 
 use Illuminate\Support\Facades\DB;
 use InstagramScraper\Exception\InstagramNotFoundException;
-use Phpfastcache\Helper\Psr16Adapter;
-use InstagramScraper\Instagram;
 
 
 class parseInstagram implements ShouldQueue
@@ -42,21 +40,7 @@ class parseInstagram implements ShouldQueue
             return;
         }
 
-        $httpConfig = $config->proxy ? ['proxy' => $config->proxy] : [];
-
-        $instagram  = Instagram::withCredentials(
-            new \GuzzleHttp\Client($httpConfig),
-            $config->login,
-            $config->password,
-            new Psr16Adapter('Files')
-        );
-
-        if($config->session){
-            $instagram->loginWithSessionId($config->session);
-        }else {
-            $instagram->login(); // по умолчанию ищет закешированную saveSession()
-            $instagram->saveSession(86400);
-        }
+        $instagram  = $config->getClient();
 
         $sources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active` > 0;");
         foreach ($sources as $source) {                                                 //перебираем все активные аккаунты в инсте
@@ -95,5 +79,7 @@ class parseInstagram implements ShouldQueue
 
             DB::table('posts')->insert( array_reverse($insertion) );                    // сохраняем в хронологическом порядке
         }
+
+        $config->dropErrors();
     }
 }

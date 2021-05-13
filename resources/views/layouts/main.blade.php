@@ -9,7 +9,7 @@
     <!-- Bootstrap core CSS -->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
 
-    <script src="/js/jquery-3.5.1.slim.min.js" ></script>
+    <script src="/js/jquery-3.6.0.min.js" ></script>
     <script type="text/javascript" src="/js/moment.min.js"></script>
     <script type="text/javascript" src="/js/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="/css/daterangepicker.css" />
