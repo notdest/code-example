@@ -98,6 +98,8 @@ class ArticleController extends Controller
         if($search->stream > 0){
             $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');
             $sourceCond = 'AND source_id IN ('.implode(',',$ids->toArray()).') ';
+        }elseif($search->source > 0){
+            $sourceCond = "AND source_id = {$search->source} ";
         }
 
         $categoryCond = '';
@@ -138,6 +140,8 @@ class ArticleController extends Controller
         if($search->stream > 0){
             $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');
             $db  = $db->whereIn('source_id',$ids->toArray());
+        }elseif($search->source > 0){
+            $db  = $db->where('source_id',$search->source );
         }
 
         if($search->category){
@@ -158,6 +162,7 @@ class ArticleController extends Controller
     private function getSearch($request){
         $search             = new \stdClass();
         $search->stream     = (int) $request->stream        ?? 0;
+        $search->source     = (int) $request->source        ?? 0;
         $search->category   = (int) $request->category      ?? 0;
         $search->from       = $request->from                ?? date('Y-m-d 00:00:00');
         $search->to         = $request->to                  ?? date('Y-m-d 23:59:59');

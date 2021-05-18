@@ -9,6 +9,10 @@ class RssSource extends Model
     protected $table    = 'rss_sources';
     public $timestamps  = false;
 
+    protected $fillable = [
+        'name', 'link', 'active'
+    ];
+
     const STREAM_COSMO      = 1;
     const STREAM_GOODHOUSE  = 2;
     const STREAM_POPMECH    = 4;
@@ -27,4 +31,21 @@ class RssSource extends Model
        // self::STREAM_ROBB       => "Robb Report",
     ];
 
+    public static $fieldNames = [
+        'id'        => 'Id',
+        'name'      => 'Название',
+        'link'      => 'Ссылка',
+        'stream'    => 'Потоки',
+        'active'    => 'Статус',
+    ];
+
+    public function getStreamsAttribute():array{
+        $ret    = [];
+        foreach (self::$streams as $k => $stream) {
+            if($this->stream & $k){
+                $ret[$k] = $stream;
+            }
+        }
+        return $ret;
+    }
 }
