@@ -46,9 +46,15 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::get( '/rss-category/',               'RssCategoryController@index');
     Route::get( '/rss-category/delete/{id}/',   'RssCategoryController@delete');
     Route::post('/rss-category/write/',         'RssCategoryController@write');
+
+    Route::get( '/rss-sources/',                'RssSourceController@index');
+    Route::get( '/rss-sources/create/',         'RssSourceController@create');
+    Route::post('/rss-sources/create/',         'RssSourceController@store');
+    Route::get( '/rss-sources/edit/{id}/',      'RssSourceController@edit');
+    Route::post('/rss-sources/edit/{id}/',      'RssSourceController@save');
 });
 
-Route::get('/', 'UserController@defaultPage')->middleware('auth');
+Route::get('/',                         'UserController@defaultPage')->middleware('auth');
 Route::get('/trends/',                  'TrendController@index');
 Route::get('/trends/download/',         'TrendController@download');
 

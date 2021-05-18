@@ -63,6 +63,10 @@ class subscribeInstagram extends Command
 
         $usernames   = array_map(function ($v){ return $v['username'];},$subscribed['accounts'] );
 
+        if((count($usernames)+$limit)%20 === 0){        // Этот костыль нужен из-за того, что библиотека вылетает, когда
+            $limit -= 1;                                // подписок кратно 20
+        }
+
         $sources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active` > 0;");
 
         echo "Total sources (with subscribed):".count($sources)."   limit: $limit\n\n";
