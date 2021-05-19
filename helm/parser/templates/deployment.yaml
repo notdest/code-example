@@ -37,7 +37,7 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["gcsfuse", "{{ .Values.env.IMAGE_BUCKET }}", "/var/www/public/img_cache"]
+                command: ["gcsfuse", "-o", "allow_other", {{ .Values.env.IMAGE_BUCKET }}", "/var/www/public/img_cache"]
             preStop:
               exec:
                 command: ["fusermount", "-u", "/var/www/public/img_cache"]
