@@ -49,7 +49,7 @@ env:
 
   SENTRY_LARAVEL_DSN: "https://91a86ed7f251403e8ed78b4039046dc4@sentry.fppressa.ru//4"
 
-  IMAGE_BUCKER: im-parser
+  IMAGE_BUCKET: im-parser
 
 db:
   migrations: true
