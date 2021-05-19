@@ -40,6 +40,13 @@ class parseInstagramQuick implements ShouldQueue
             return;
         }
 
+        $baseDir   = '/var/www/public/';
+        $cacheDir = 'img_cache/'.date("Y_m");
+        if(!file_exists($baseDir.$cacheDir)){
+            mkdir($baseDir.$cacheDir);
+        }
+
+        $httpClient = new \GuzzleHttp\Client();
         $instagram  = $config->getClient();
         $posts      = $instagram->getFeed();
 
@@ -79,12 +86,15 @@ class parseInstagramQuick implements ShouldQueue
                 break;
             }
 
+            $imgUrl     = ($post->getImageStandardResolutionUrl())  ?: $post->getImageHighResolutionUrl();
+            $httpClient->request('GET', $imgUrl, ['sink' => $baseDir.$cacheDir."/".$post->getShortCode().".jpg"]);
+
             $newRow = [
                 'postId'        => $post->getShortCode(),
                 'numericalId'   => $post->getId(),
                 'createdTime'   => date("Y-m-d H:i:s",$post->getCreatedTime()+(3*3600)),
                 'text'          => $post->getCaption(),
-                'image'         => ($post->getImageStandardResolutionUrl())  ?: $post->getImageHighResolutionUrl(),
+                'image'         => '/'.$cacheDir."/".$post->getShortCode().".jpg",
             ];
 
             if( $controlUsernames[$post->getId()] ){           // У этого поста получен ник автора
