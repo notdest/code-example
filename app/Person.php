@@ -9,5 +9,8 @@ class Person extends Model
     protected $table    = 'persons';
     public $timestamps  = false;
 
+    protected $fillable = [
+        'name', 'hidden'
+    ];
 
 }

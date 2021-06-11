@@ -15,15 +15,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:post-viewer'])->group(function () {
     Route::get('/posts/',               'PostController@index');
-
-    Route::get('/platforms/list',       'PlatformController@list');
-    Route::get('/platforms/alphabet',   'PlatformController@alphabet');
-
+    Route::get('/sources/',             'SourceController@index');
     Route::get('/persons/',             'PersonController@index');
 });
 
 Route::middleware(['auth', 'can:post-editor'])->group(function () {
-    Route::get('/persons/delete/{id}/', 'PersonController@delete');
+    Route::get('/persons/hide/{id}/',   'PersonController@hide');
+    Route::get('/persons/show/{id}/',   'PersonController@show');
+    Route::get('/persons/create/',      'PersonController@create');
+    Route::post('/persons/create/',     'PersonController@store');
+    Route::get('/persons/edit/{id}/',   'PersonController@edit');
+    Route::post('/persons/edit/{id}/',  'PersonController@save');
+
+    Route::get('/sources/activate/{id}/',   'SourceController@activate');
+    Route::get('/sources/deactivate/{id}/', 'SourceController@deactivate');
+    Route::get('/sources/edit/{id}/',       'SourceController@edit');
+    Route::post('/sources/edit/{id}/',      'SourceController@save');
+    Route::get('/sources/create/',          'SourceController@create');
+    Route::post('/sources/create/',         'SourceController@store');
 });
 
 Route::middleware(['auth', 'can:article-viewer'])->group(function () {

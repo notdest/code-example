@@ -13,7 +13,11 @@ class subscribeInstagram extends Command
      *
      * @var string
      */
-    protected $signature = 'Instagram:subscribe {limit=50}';
+    protected $signature = 'Instagram:subscribe {limit=50} {--p|progress}';
+
+    private $instagram;
+    private $processed  = 0;
+    private $progress   = false;
 
     /**
      * The console command description.
@@ -39,7 +43,8 @@ class subscribeInstagram extends Command
      */
     public function handle()
     {
-        $limit      = $this->argument('limit');
+        $limit          = $this->argument('limit');
+        $this->progress = $this->option("progress");    // показывать ли прогресс
 
         $config     = new \App\Configs\Instagram();
 
@@ -47,54 +52,31 @@ class subscribeInstagram extends Command
             return 0;
         }
 
-        $instagram  = $config->getClient();
+        $this->instagram  = $config->getClient();
         sleep(2);
 
-        $account    = $instagram->getAccount($config->login);
-        sleep(1);
+        $alreadyFollowings  = $this->followings($config->login); // подписки, в одной "желаемые", в другой - "действительные"
+        $requiredFollowings = DB::table('sources')->where('type','=','instagram')->where('active','>','0')
+                                                                                 ->pluck('id','code')->all();
 
-        try {
-            $subscribed = $instagram->getFollowing($account->getId(),500);  // решил, что 500 подписок достаточно
-        }catch (InstagramException $e){
-            $this->err( "could not get followings");
-            return 0;
-        }
-
-
-        $usernames   = array_map(function ($v){ return $v['username'];},$subscribed['accounts'] );
-
-        if((count($usernames)+$limit)%20 === 0){        // Этот костыль нужен из-за того, что библиотека вылетает, когда
+        if((count($alreadyFollowings)+$limit)%20 === 0){ // Этот костыль нужен из-за того, что библиотека вылетает, когда
             $limit -= 1;                                // подписок кратно 20
         }
 
-        $sources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active` > 0;");
+        foreach ($alreadyFollowings as $code){                      // сналчала удаляем те, которые есть, но не должны быть
+            if(!isset($requiredFollowings[$code])){
+                $this->output("processed: {$this->processed}\r");
+                $this->checkLimit($limit,$config);
+                $this->unfollow($code);
+            }
+        }
 
-        echo "Total sources (with subscribed):".count($sources)."   limit: $limit\n\n";
-
-        $i = 0;
-        foreach ($sources as $source){
-            if(!in_array($source->code,$usernames)){
-                echo "processed: $i\r";
-
-                if ($i >= $limit){
-                    echo "\n\nlimit reached: $limit\n";
-                    $config->dropErrors();
-                    return 0;
-                }
-
-                try {
-                    $account = $instagram->getAccount($source->code);
-                    $instagram->follow($account->getId());
-
-                    sleep(rand(1,5));
-                    $i++;
-                }catch (InstagramNotFoundException $e){
-                    $this->call('Instagram:deactivate', [ 'id' => $source->id ]);
-                }catch (InstagramException $e){
-                    $this->err( "Unknown error: https://www.instagram.com/{$source->code}/\n".
-                                "command for deactivate: ./artisan Instagram:deactivate $source->id");
-                    return 0;
-                }
+        $this->output("Total sources (with subscribed):".count($requiredFollowings)."   limit: $limit\n\n");
+        foreach ($requiredFollowings as $code => $id){              // потом добавляем те, которых нет но должны быть
+            if(!in_array($code,$alreadyFollowings)){
+                $this->output("processed: {$this->processed}\r");
+                $this->checkLimit($limit,$config);
+                $this->follow($code,$id);
             }
         }
 
@@ -103,6 +85,64 @@ class subscribeInstagram extends Command
         $config->save();                        // то можно выключать парсинг
 
         return 0;
+    }
+
+
+
+
+
+    private function output($text){
+        if($this->progress){
+            echo $text;
+        }
+    }
+
+    private function checkLimit($limit,$config){
+        if ($this->processed >= $limit){
+            $this->output("\n\nlimit reached: $limit\n");
+            $config->dropErrors();
+            exit(0);
+        }
+    }
+
+    // подписывается на акк по коду, или удаляет его по id в нашей базе
+    private function follow($code,$id){
+        try {
+            $account = $this->instagram->getAccount($code);
+            $this->instagram->follow($account->getId());
+
+            sleep(rand(1,5));
+            $this->processed++;
+        }catch (InstagramNotFoundException $e){
+            $this->call('Instagram:deactivate', [ 'id' => $id ]);
+        }catch (InstagramException $e){
+            $this->err( "Unknown error: https://www.instagram.com/{$code}/\n".
+                "command for deactivate: ./artisan Instagram:deactivate $id");
+            exit(1);
+        }
+    }
+
+    private function unfollow($code){
+        $account = $this->instagram->getAccount($code);
+        $this->instagram->unfollow($account->getId());
+
+        sleep(rand(1,5));
+        $this->processed++;
+    }
+
+    // возвращает массив с юзернеймами тех, на кого подписан аккаунт
+    private function followings($login){
+        $account    = $this->instagram->getAccount($login);
+        sleep(1);
+
+        try {
+            $subscribed = $this->instagram->getFollowing($account->getId(),500);  // решил, что 500 подписок достаточно
+        }catch (InstagramException $e){
+            $this->err( "could not get followings");
+            exit(1);
+        }
+
+        return  array_map(function ($v){ return $v['username'];},$subscribed['accounts'] );
     }
 
     private function err($msg){
