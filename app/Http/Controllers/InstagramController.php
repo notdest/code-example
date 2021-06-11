@@ -84,18 +84,26 @@ class InstagramController extends Controller
             return "Не смог получить подписки";
         }
 
-        $usernames   = array_map(function ($v){ return $v['username'];},$subscribed['accounts'] );
-
-        $sources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active` > 0;");
+        $alreadyFollowings  = array_map(function ($v){ return $v['username'];},$subscribed['accounts'] );
+        $requiredFollowings = DB::table('sources')->where('type','=','instagram')->where('active','>','0')
+                                                                                 ->pluck('code')->all();
 
         $unsubscribed = [];
-        foreach ($sources as $source){
-            if(!in_array($source->code,$usernames)){
-                $unsubscribed[]   = $source->code;
+        foreach ($requiredFollowings as $code){
+            if(!in_array($code,$alreadyFollowings)){
+                $unsubscribed[]   = $code;
+            }
+        }
+
+        $excess = [];
+        foreach ($alreadyFollowings as $code) {
+            if(!in_array($code,$requiredFollowings)){
+                $excess[]   = $code;
             }
         }
 
         $config->dropErrors();
-        return "Не подписано ".count($unsubscribed)." из ".count($sources)." персон(обрабатываем <= 500)";
+        return "Не подписано ".count($unsubscribed)." из ".count($requiredFollowings)." персон(обрабатываем <= 500). ".
+            "Лишних ".count($excess).' персон.';
     }
 }
