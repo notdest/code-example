@@ -94,6 +94,31 @@
             </div>
         </div>
 
+        <script type="text/javascript">
+            function showLostPosts(){
+                $.get( "/instagram/show-lost-posts/", function( data ) {
+                    $( "#lostPosts" ).text(data);
+                });
+            }
+
+            function checkLostPosts(){
+                let confirmed  = confirm('Это ресурсоёмкая задача, запускаем?');
+                if (confirmed){
+                    $("#checkLostButton").attr('disabled','disabled');
+                    $.get( "/instagram/check-lost-posts/");
+                }
+            }
+        </script>
+        <div class="form-group">
+            <button type="button" class="btn btn-dark" onclick="checkLostPosts()" id="checkLostButton" {{ $lostChecking ? 'disabled' : '' }}>
+                Проверка пропущенных постов
+            </button>
+            <button type="button" class="btn btn-dark" onclick="showLostPosts()" >
+                Вывод последней проверки
+            </button>
+        </div>
+        <pre id="lostPosts"> </pre>
+
         @csrf
         <input type="submit" value="Сохранить" class="btn btn-success">
     </form>

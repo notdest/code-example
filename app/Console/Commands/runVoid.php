@@ -11,7 +11,7 @@ class runVoid extends Command
      *
      * @var string
      */
-    protected $signature = 'run:void {job=0}';
+    protected $signature = 'run:void {job=0} {--t|time}';
 
     /**
      * The console command description.
@@ -40,8 +40,15 @@ class runVoid extends Command
         $job    = $this->argument('job');
 
         if($job){
+            $time   = $this->option('time');
+            if($time){
+                echo date("Y-m-d H:i:s\n");
+            }
             $class  = "\App\Jobs\\$job";
             dispatch( new $class());
+            if($time){
+                echo date("Y-m-d H:i:s\n");
+            }
         }else{
             echo "Не указана job-класс\n";
         }
