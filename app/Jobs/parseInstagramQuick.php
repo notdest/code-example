@@ -47,11 +47,10 @@ class parseInstagramQuick implements ShouldQueue
         }
 
         $httpClient = new \GuzzleHttp\Client();
-        $instagram  = $config->getClient();
-        $posts      = $instagram->getFeed();
+        $posts      = $this->getFeed($config);
 
         $usernames  = $controlUsernames = $ids = [];
-        foreach ($posts as $k => $post){
+        foreach ($posts as $post){
             $id     = $post->getId();
             $ids[]  =$id;
 
@@ -127,5 +126,26 @@ class parseInstagramQuick implements ShouldQueue
             $config->save();
             Artisan::call('Instagram:subscribe', [ 'limit' => 4 ]);
         }
+    }
+
+    protected function getFeed($config){
+        $instagram  = $config->getClient();
+
+        $posts       = [];
+        $hasNextPage = true;
+        $maxId  = '';
+        $i      = 1;
+        while ($hasNextPage){
+            $result      = $instagram->getPaginateFeed(50,$maxId);
+            $maxId       = $result['maxId'];
+            $hasNextPage = $result['hasNextPage'];
+            $posts       = array_merge($posts,$result['medias']);
+
+            if($i >= $config->feedMaxPages) break;
+            $i ++;
+            sleep(rand(1,3));
+        }
+
+        return $posts;
     }
 }

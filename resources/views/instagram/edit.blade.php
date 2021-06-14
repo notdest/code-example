@@ -94,6 +94,12 @@
             </div>
         </div>
 
+
+        <div class="form-group">
+            <label for="config_feed_pages" >{{ $config->fieldName('feedMaxPages') }}</label>
+            <input type="text" class="form-control" id="config_feed_pages" name="feedMaxPages" value="{{ $config->feedMaxPages }}">
+        </div>
+
         <script type="text/javascript">
             function showLostPosts(){
                 $.get( "/instagram/show-lost-posts/", function( data ) {

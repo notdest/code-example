@@ -30,6 +30,7 @@ class InstagramController extends Controller
         $fields = $request->except('_token');
         $validator  = \Validator::make($fields,[
             'enabled'       => 'boolean',
+            'feedMaxPages'  => 'required|int',
             'emails'        => ['required', function ($attribute, $value, $fail)use($config) {
                 $addresses  = explode(',',$value);
 
