@@ -94,6 +94,37 @@
             </div>
         </div>
 
+
+        <div class="form-group">
+            <label for="config_feed_pages" >{{ $config->fieldName('feedMaxPages') }}</label>
+            <input type="text" class="form-control" id="config_feed_pages" name="feedMaxPages" value="{{ $config->feedMaxPages }}">
+        </div>
+
+        <script type="text/javascript">
+            function showLostPosts(){
+                $.get( "/instagram/show-lost-posts/", function( data ) {
+                    $( "#lostPosts" ).text(data);
+                });
+            }
+
+            function checkLostPosts(){
+                let confirmed  = confirm('Это ресурсоёмкая задача, запускаем?');
+                if (confirmed){
+                    $("#checkLostButton").attr('disabled','disabled');
+                    $.get( "/instagram/check-lost-posts/");
+                }
+            }
+        </script>
+        <div class="form-group">
+            <button type="button" class="btn btn-dark" onclick="checkLostPosts()" id="checkLostButton" {{ $lostChecking ? 'disabled' : '' }}>
+                Проверка пропущенных постов
+            </button>
+            <button type="button" class="btn btn-dark" onclick="showLostPosts()" >
+                Вывод последней проверки
+            </button>
+        </div>
+        <pre id="lostPosts"> </pre>
+
         @csrf
         <input type="submit" value="Сохранить" class="btn btn-success">
     </form>

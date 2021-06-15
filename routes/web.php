@@ -51,6 +51,8 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/instagram/edit/',             'InstagramController@save');
     Route::get( '/instagram/check-email/',      'InstagramController@checkEmail');
     Route::get( '/instagram/check-subscribed/', 'InstagramController@checkSubscribed');
+    Route::get( '/instagram/show-lost-posts/',  'InstagramController@showLostPosts');
+    Route::get( '/instagram/check-lost-posts/', 'InstagramController@checkLostPosts');
 
     Route::get( '/rss-category/',               'RssCategoryController@index');
     Route::get( '/rss-category/delete/{id}/',   'RssCategoryController@delete');

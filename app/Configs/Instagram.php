@@ -16,6 +16,7 @@ class Instagram extends Config
     public $proxy               = '';
     public $emails              = '';
     public $enableSubscription  = 0;
+    public $feedMaxPages        = 1;
 
     // Технические параметры, они не видны на странице настроек
     public $lastSubscribe   = 0;    // timeStamp когда в последний раз пытались подписываться на персон
@@ -38,6 +39,7 @@ class Instagram extends Config
             'enableSubscription'    => 'Включено подписывание',
             'lastSubscribe'         => 'Время последнего подписывания',
             'errors'                => 'Ошибок авторизации подряд',
+            'feedMaxPages'          => 'Максимум загружаемых страниц',
         ];
     }
 

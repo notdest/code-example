@@ -11,12 +11,16 @@ use InstagramScraper\Exception\InstagramException;
 
 class InstagramController extends Controller
 {
+    public static $latch = '/var/www/storage/app/public/lost_posts_latch.txt';
+
+
 
     public function edit(){
 
         $config = new \App\Configs\Instagram();
         return view('instagram.edit',[
-            'config'    => $config,
+            'config'        => $config,
+            'lostChecking'  => $this->latchLocked(),
         ]);
     }
 
@@ -26,6 +30,7 @@ class InstagramController extends Controller
         $fields = $request->except('_token');
         $validator  = \Validator::make($fields,[
             'enabled'       => 'boolean',
+            'feedMaxPages'  => 'required|int',
             'emails'        => ['required', function ($attribute, $value, $fail)use($config) {
                 $addresses  = explode(',',$value);
 
@@ -54,6 +59,7 @@ class InstagramController extends Controller
             'config'    => $config,
             'success'   => $success,
             'errors'    => $validator->errors(),
+            'lostChecking'  => $this->latchLocked(),
         ]);
 
     }
@@ -105,5 +111,27 @@ class InstagramController extends Controller
         $config->dropErrors();
         return "Не подписано ".count($unsubscribed)." из ".count($requiredFollowings)." персон(обрабатываем <= 500). ".
             "Лишних ".count($excess).' персон.';
+    }
+
+    public function showLostPosts(){
+        $file = '/var/www/storage/app/public/lost_posts.txt';
+        if(!file_exists($file)){
+            return "Не найден файл с результатом";
+        }else{
+            return file_get_contents($file);
+        }
+    }
+
+    public function checkLostPosts(){
+        if($this->latchLocked()){
+            return "already launched";
+        }else{
+            dispatch( new \App\Jobs\InstagramLostPosts());
+            return "ok";
+        }
+    }
+
+    private function latchLocked(){
+        return (file_exists(self::$latch) && (time()-filemtime(self::$latch)) < 800);
     }
 }
