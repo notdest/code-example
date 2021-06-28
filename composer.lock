@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "789827a72e0f52d3f2f87c526a3c8686",
+    "content-hash": "f814fa0b6fdc7c217fd9c46a248a0d62",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -9281,7 +9281,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "raiym/instagram-php-scraper": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

@@ -59,10 +59,6 @@ class subscribeInstagram extends Command
         $requiredFollowings = DB::table('sources')->where('type','=','instagram')->where('active','>','0')
                                                                                  ->pluck('id','code')->all();
 
-        if((count($alreadyFollowings)+$limit)%20 === 0){ // Этот костыль нужен из-за того, что библиотека вылетает, когда
-            $limit -= 1;                                // подписок кратно 20
-        }
-
         foreach ($alreadyFollowings as $code){                      // сналчала удаляем те, которые есть, но не должны быть
             if(!isset($requiredFollowings[$code])){
                 $this->output("processed: {$this->processed}\r");
