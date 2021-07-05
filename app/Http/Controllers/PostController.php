@@ -33,7 +33,7 @@ class PostController extends Controller
             $posts  = $posts->where('sources.type','=','facebook');
         }
 
-        $posts  = $posts->paginate(15);
+        $posts  = $posts->paginate(60);
 
         $config = new \App\Configs\Instagram();
 
