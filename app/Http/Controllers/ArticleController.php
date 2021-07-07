@@ -13,7 +13,7 @@ class ArticleController extends Controller
     //
     public function index(Request $request){
         $search   = $this->getSearch($request);
-        $articles = $this->getArticles($search,15);
+        $articles = $this->getArticles($search,500);
 
         return view('articles.index',[
             'search'    => $search,
@@ -151,7 +151,7 @@ class ArticleController extends Controller
         $db = $db->orderBy('pub_date', 'desc');
 
         if($paginate){
-            $articles = $db->paginate(15);
+            $articles = $db->paginate($paginate);
         }else{
             $articles = $db->get()->all();
         }
