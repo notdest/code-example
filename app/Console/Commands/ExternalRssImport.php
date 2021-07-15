@@ -14,12 +14,19 @@ class ExternalRssImport extends Command
      *
      * @var string
      */
-    protected $signature = 'rss:import';
+    protected $signature = 'rss:import {debugId=0}';
+    protected $debugId   = 0;
 
     public function handle()
     {
         set_time_limit ( 600 );
-        $sources = DB::select('SELECT * FROM `rss_sources` WHERE `active` > 0;');
+        $this->debugId = $this->argument('debugId');        // отладка конретного источника, вывод в stdout вместо записи в БД
+
+        if ($this->debugId > 0){
+            $sources = DB::select('SELECT * FROM `rss_sources` WHERE `id` = '.intval($this->debugId).';');
+        }else{
+            $sources = DB::select('SELECT * FROM `rss_sources` WHERE `active` > 0;');
+        }
 
         $classifier = RssCategory::getClassifier();
 
@@ -27,46 +34,45 @@ class ExternalRssImport extends Command
         $exceptions = [];
 
         foreach ($sources as $source ) {
+            $class      = '\App\Console\Commands\rss_adapters\\'.$source->adapter;
+            $adapter    = new  $class();
+
             try {
-                $response = $httpClient->request('GET', $source->link);
-
-                libxml_use_internal_errors(true);
-                $xml = simplexml_load_string($response->getBody()->getContents(), "SimpleXMLElement", LIBXML_NOCDATA);
-                libxml_clear_errors();  // ошибки типо неизвестного неймспейса, поэтому игнорируем
-                                        // если не спарсится, то где-то дальше вылетит
-
-                if(isset($xml->channel->item)){     // TODO: убрать этот костыль, один канал мы точно пропускаем
-                    $items  = $xml->channel->item;
-                }else{
-                    continue;
-                }
+                $response   = $httpClient->request('GET', $source->link);
+                $plainXml   = $adapter->filter($response->getBody()->getContents());
+                $xml        = simplexml_load_string($plainXml, "SimpleXMLElement", LIBXML_NOCDATA);
             } catch (\Throwable $e) {
                 $exceptions[]   = $e;
                 continue;
             }
 
+            $items  = $adapter->getItems($xml);
 
-            foreach ($items as $item) {
+
+            foreach ($items as $rawItem) {
                 try {
-                    if(isset($item->category)){
-                        $unknown = (is_array($item->category)) ? $item->category : [$item->category];
+                    $item   = $adapter->extractItem($rawItem,$source->id);
+
+                    if(count($item->categories)){
+                        $unknown = $item->categories;
                         list($categories,$unknown)  = $classifier($source->id,$unknown);
                     }else{
                         $categories = 0;
                         $unknown    = [];
                     }
 
-                    if ($this->itemToSave($item)){
+                    if ($this->itemToSave($item->externalId)){
                         $this->itemSave([
-                            'pub_date'    => isset($item->pubDate) ? Carbon::parse($item->pubDate)->format('Y-m-d H:i:s') : null,
+                            'pub_date'    => $item->pubDate,
                             'source_id'   => $source->id,
-                            'title'       => $item->title ?? '',
-                            'link'        => $item->link  ?? '',
+                            'title'       => $item->title,
+                            'link'        => $item->link,
                             'categories'  =>  $categories,
                             'unknown_categories' => mb_substr( implode(', ',$unknown) ,0,255,'UTF-8'),
-                            'external_id' => $item->guid  ?? ($item->link ?? ''),
+                            'external_id' => $item->externalId,
                         ]);
                     }
+
                 } catch (\Throwable $e) {
                     $exceptions[]   = $e;
 
@@ -84,32 +90,20 @@ class ExternalRssImport extends Command
         }
     }
 
-    private function itemSave($item)
-    {
+    private function itemSave($item){
+        if ($this->debugId > 0){
+            print_r($item);
+            return true;
+        }
         return \DB::table('rss_imported')->insert($item);
     }
 
-    private function itemToSave($item)
-    {
-        $itemArr = (array) $item;               // Todo: переписать без приведения к массиву, так будет читаемей
-                                                // вообще это дублирование кода, мы то же самое делаем при записи
-        $query = \DB::table('rss_imported');
-
-        if (isset($itemArr['guid'])){
-            $query->where('external_id', $itemArr['guid']);
-            if (isset($itemArr['link'])){
-                $query->orWhere('external_id', $itemArr['link']);
-            }
-        } elseif (isset($itemArr['link'])){
-            $query->where('external_id', $itemArr['link']);
-        } else {
-            if (isset($itemArr['title'])) {
-                $query->where('title', $itemArr['title']);
-            } else {
-                return false; // пропускаем rss items без guid, link, title
-            }
+    private function itemToSave($externalId){
+        if ($this->debugId > 0){
+            return true;
         }
 
+        $query = \DB::table('rss_imported')->where('external_id', $externalId);
         return !(bool)$query->first();
     }
 }

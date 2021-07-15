@@ -10,7 +10,7 @@ class RssSource extends Model
     public $timestamps  = false;
 
     protected $fillable = [
-        'name', 'link', 'active'
+        'name', 'link', 'active', 'adapter'
     ];
 
     const STREAM_COSMO      = 1;
@@ -37,6 +37,7 @@ class RssSource extends Model
         'link'      => 'Ссылка',
         'stream'    => 'Потоки',
         'active'    => 'Статус',
+        'adapter'   => 'Адаптер',
     ];
 
     public function getStreamsAttribute():array{
