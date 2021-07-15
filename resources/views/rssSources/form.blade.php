@@ -1,6 +1,10 @@
 @php
     $fields     = \App\RssSource::$fieldNames;
     $streams    = \App\RssSource::$streams;
+
+    $adapters   = scandir(app_path('Console/Commands/rss_adapters/'));
+    $adapters   = array_filter($adapters,function($v){ return !in_array($v,['..','.']);});
+    $adapters   = array_map(function ($v){return str_replace('.php','',$v);},$adapters);
 @endphp
 
 @if ($errors->any())
@@ -41,6 +45,15 @@
         <small id="streamHelpBlock" class="form-text text-muted">
             Ctrl для множественного выделения.
         </small>
+    </div>
+
+    <div class="form-group">
+        <label for="source_adapter" >{{ $fields['adapter'] }}</label>
+        <select class="form-control form-control-sm" id="source_adapter" name="adapter">
+            @foreach($adapters as $adapter)
+                <option value="{{$adapter}}" {{ ($source->adapter == $adapter) ? 'selected':'' }}>{{$adapter}}</option>
+            @endforeach
+        </select>
     </div>
 
     <div class="form-group">
