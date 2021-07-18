@@ -11,6 +11,7 @@ class common{
     }
 
     public function filter($xml){
+        $xml = str_replace('<...>','',$xml);
         return $xml;
     }
 
