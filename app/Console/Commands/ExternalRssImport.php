@@ -57,19 +57,21 @@ class ExternalRssImport extends Command
                         $unknown = $item->categories;
                         list($categories,$unknown)  = $classifier($source->id,$unknown);
                     }else{
-                        $categories = 0;
+                        $categories = $source->default_categories;
                         $unknown    = [];
                     }
 
                     if ($this->itemToSave($item->externalId)){
                         $this->itemSave([
-                            'pub_date'    => $item->pubDate,
-                            'source_id'   => $source->id,
-                            'title'       => $item->title,
-                            'link'        => $item->link,
-                            'categories'  =>  $categories,
-                            'unknown_categories' => mb_substr( implode(', ',$unknown) ,0,255,'UTF-8'),
-                            'external_id' => $item->externalId,
+                            'pub_date'              => $item->pubDate,
+                            'source_id'             => $source->id,
+                            'title'                 => $item->title,
+                            'foreign_title'         => $item->foreignTitle,
+                            'link'                  => $item->link,
+                            'categories'            => $categories,
+                            'unknown_categories'    => mb_substr( implode(', ',$unknown) ,0,255,'UTF-8'),
+                            'external_id'           => $item->externalId,
+                            'translate'             => $item->translate,
                         ]);
                     }
 

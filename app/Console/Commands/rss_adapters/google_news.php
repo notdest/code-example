@@ -3,7 +3,7 @@ namespace App\Console\Commands\rss_adapters;
 
 use Illuminate\Support\Carbon;
 
-class google_news{
+class google_news extends common{
 
 
     public function getItems($xml){
@@ -23,17 +23,6 @@ class google_news{
         $item->link         = reset($rawItem->loc);
         $item->externalId   = $item->link;
 
-        return $item;
-    }
-
-
-    private function getDefaultItem(){
-        $item   = new \stdClass();
-        $item->pubDate      = '';
-        $item->title        = '';
-        $item->link         = '';
-        $item->categories   = [];
-        $item->externalId   = '';
         return $item;
     }
 }
