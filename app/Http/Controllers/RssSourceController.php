@@ -42,6 +42,7 @@ class RssSourceController extends Controller
             'link'      => ['required','active_url',Rule::unique('rss_sources')->ignore($source->id)],
             'streams'   => 'required',
             'active'    => 'boolean',
+            'foreign'   => 'boolean',
         ]);
 
         $success = false;
@@ -49,6 +50,13 @@ class RssSourceController extends Controller
             $source->stream = 0;
             foreach ($fields['streams'] as $stream) {
                 $source->stream = $source->stream | $stream;
+            }
+
+            $source->default_categories = 0;
+            if(isset($fields['categories'])) {
+                foreach ($fields['categories'] as $category) {
+                    $source->default_categories = $source->default_categories | $category;
+                }
             }
 
             $success = $source->save();
@@ -78,12 +86,20 @@ class RssSourceController extends Controller
             'link'      => 'required|active_url|unique:App\RssSource,link',
             'streams'   => 'required',
             'active'    => 'boolean',
+            'foreign'   => 'boolean',
         ]);
 
         if($validator->passes()){
             $source->stream = 0;
             foreach ($fields['streams'] as $stream) {
                 $source->stream = $source->stream | $stream;
+            }
+
+            $source->default_categories = 0;
+            if(isset($fields['categories'])) {
+                foreach ($fields['categories'] as $category) {
+                    $source->default_categories = $source->default_categories | $category;
+                }
             }
 
             $source->save();

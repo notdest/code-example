@@ -1,6 +1,7 @@
 @php
     $fields     = \App\RssSource::$fieldNames;
     $streams    = \App\RssSource::$streams;
+    $categories = \App\Article::$categories ;
 
     $adapters   = scandir(app_path('Console/Commands/rss_adapters/'));
     $adapters   = array_filter($adapters,function($v){ return !in_array($v,['..','.']);});
@@ -67,6 +68,34 @@
             <div class="form-check form-check-inline">
                 <input class="form-check-input" type="radio" name="active" id="source_active2" value="1" {{ ($source->active != 0) ? 'checked':'' }}>
                 <span>Включен</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label for="source_default_categories" >{{ $fields['default_categories'] }}</label>
+        <select multiple class="form-control" id="source_default_categories" name="categories[]"
+                aria-describedby="defaultCategoriesHelpBlock" style="height: 350px;">
+            @foreach($categories as $k => $category)
+                <option value="{{$k}}" {{ ($k & $source->default_categories) ? "selected" : "" }}>{{$category}}</option>
+            @endforeach
+        </select>
+        <small id="defaultCategoriesHelpBlock" class="form-text text-muted">
+            Ctrl для множественного выделения.
+        </small>
+    </div>
+
+    <div class="form-group">
+        <label for="source_foreign" >{{ $fields['foreign'] }}</label>
+
+        <div id="source_foreign">
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="foreign" id="source_foreign1" value="0" {{ ($source->foreign == 0) ? 'checked':'' }}>
+                <span>Российский</span>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="foreign" id="source_foreign2" value="1" {{ ($source->foreign != 0) ? 'checked':'' }}>
+                <span>Иностранный</span>
             </div>
         </div>
     </div>
