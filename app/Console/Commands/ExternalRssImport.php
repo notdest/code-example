@@ -32,6 +32,7 @@ class ExternalRssImport extends Command
 
         $httpClient = new \GuzzleHttp\Client();
         $exceptions = [];
+        $translate  = false;
 
         foreach ($sources as $source ) {
             $class      = '\App\Console\Commands\rss_adapters\\'.$source->adapter;
@@ -62,6 +63,10 @@ class ExternalRssImport extends Command
                     }
 
                     if ($this->itemToSave($item->externalId)){
+                        if($source->foreign > 0){
+                            $translate = true;
+                        }
+
                         $this->itemSave([
                             'pub_date'              => $item->pubDate,
                             'source_id'             => $source->id,
@@ -85,6 +90,10 @@ class ExternalRssImport extends Command
                     }
                 }
             }
+        }
+
+        if($translate){
+            dispatch( new \App\Jobs\translateRss());
         }
 
         foreach ($exceptions as $exception) {   // когда отработали сообщаем об ошибках в логгер
