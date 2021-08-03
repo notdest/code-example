@@ -95,8 +95,20 @@ class ArticleController extends Controller
         $to     = strtotime($search->to);
 
         $sourceCond = '';
-        if($search->stream > 0){
-            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');
+        if(($search->stream > 0)||($search->foreign > 0)){
+            $sourceDb = \App\RssSource::query();
+
+            if($search->stream > 0){
+                $sourceDb = $sourceDb->where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0);
+            }
+
+            if($search->foreign === 1){
+                $sourceDb = $sourceDb->where('foreign','=',0);
+            }elseif($search->foreign === 2){
+                $sourceDb = $sourceDb->where('foreign','=',1);
+            }
+
+            $ids = $sourceDb->pluck('id');
             $sourceCond = 'AND source_id IN ('.implode(',',$ids->toArray()).') ';
         }elseif($search->source > 0){
             $sourceCond = "AND source_id = {$search->source} ";
@@ -137,8 +149,20 @@ class ArticleController extends Controller
                             ->where('pub_date','>=',$search->from )
                             ->where('pub_date','<=',$search->to );
 
-        if($search->stream > 0){
-            $ids = \App\RssSource::where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0)->pluck('id');
+        if(($search->stream > 0)||($search->foreign > 0)){
+            $sourceDb = \App\RssSource::query();
+
+            if($search->stream > 0){
+                $sourceDb = $sourceDb->where( \DB::raw("(`stream` & ".intval($search->stream).")") ,'>',0);
+            }
+
+            if($search->foreign === 1){
+                $sourceDb = $sourceDb->where('foreign','=',0);
+            }elseif($search->foreign === 2){
+                $sourceDb = $sourceDb->where('foreign','=',1);
+            }
+
+            $ids = $sourceDb->pluck('id');
             $db  = $db->whereIn('source_id',$ids->toArray());
         }elseif($search->source > 0){
             $db  = $db->where('source_id',$search->source );
@@ -161,11 +185,13 @@ class ArticleController extends Controller
 
     private function getSearch($request){
         $search             = new \stdClass();
-        $search->stream     = (int) $request->stream        ?? 0;
-        $search->source     = (int) $request->source        ?? 0;
-        $search->category   = (int) $request->category      ?? 0;
+        $search->stream     = (int) ($request->stream       ?? 0);
+        $search->source     = (int) ($request->source       ?? 0);
+        $search->category   = (int) ($request->category     ?? 0);
         $search->from       = $request->from                ?? date('Y-m-d 00:00:00');
         $search->to         = $request->to                  ?? date('Y-m-d 23:59:59');
+        $search->translate  = (int) ($request->translate    ?? 1); // влияет только на отображение
+        $search->foreign    = (int) ($request->foreign      ?? 0);
 
         $search->searchQuery  = (isset($request->searchQuery)) ? trim($request->searchQuery) : '';
 

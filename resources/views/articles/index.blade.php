@@ -4,6 +4,16 @@
 @section('content')
     @php
         $params  = http_build_query((Array) $search);
+
+        $translateSelect = [
+            0 =>'Оригинальные заголовки',
+            1 =>'Переведенные заголовки',
+         ];
+        $foreignSelect = [
+            0 => 'Все страны',
+            1 => 'Российские',
+            2 => 'Зарубежные',
+        ];
     @endphp
     <h2>Статьи конкурентов</h2>
 
@@ -85,6 +95,24 @@
                 </select>
             </div>
 
+        </div>
+        <div class="row mt-2">
+            <div class="col-2">
+                <select class="form-control form-control-sm" name="foreign">
+                    @foreach ($foreignSelect as $k => $name)
+                        <option {{ (($k === $search->foreign) ? 'selected':'') }} value="{{$k}}">{{$name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="col-2">
+                <select class="form-control form-control-sm" name="translate">
+                    @foreach ($translateSelect as $k => $name)
+                        <option {{ (($k === $search->translate) ? 'selected':'') }} value="{{$k}}">{{$name}}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="col">
                 <input type="submit" value="Искать" class="btn btn-primary btn-sm">
             </div>
@@ -107,8 +135,22 @@
             </thead>
             <tbody>
             @foreach ($articles as $article)
+                @php
+                    if($search->translate>0){
+                        $title  = (strlen($article->title)>0)? $article->title : $article->foreign_title;
+                        $prompt = ( (strlen($article->title)>0)&&(strlen($article->foreign_title)>0) ) ? $article->foreign_title : '';
+                    }else{
+                        $title  = (strlen($article->foreign_title)>0)? $article->foreign_title : $article->title;
+                        $prompt = ( (strlen($article->title)>0)&&(strlen($article->foreign_title)>0) ) ? $article->title : '';
+                    }
+                @endphp
                 <tr>
-                    <td><a href="{!! $article->link !!}" target="_blank">{{ $article->title }}</a></td>
+                    <td>
+                        <a href="{!! $article->link !!}" target="_blank">{{ $title }}</a>
+                        @if(strlen($prompt)>0)
+                            <img src="/img/help.png" style="height: 1em;" data-toggle="tooltip" title="{{ $prompt }}">
+                        @endif
+                    </td>
                     <td>{{ $article->source->name }}</td>
                     <td>{{ $article->pub_date }}</td>
                     <td>{{ $article->category }}</td>
@@ -119,4 +161,9 @@
         {{ $articles->withQueryString()->links() }}
     </div>
 
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+    </script>
 @endsection
