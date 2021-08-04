@@ -53,7 +53,7 @@ class translateRss implements ShouldQueue
                 foreach ($translations as $k => $translation) {
                     $article = $articles[$k];   // я не нашел способа однозначно связать перевод с оригиналом
                     $article->translate = 0;
-                    $article->title = html_entity_decode($translation->getTranslatedText());
+                    $article->title = html_entity_decode($translation->getTranslatedText(),ENT_QUOTES);
                     $article->save();
                 }
             }
