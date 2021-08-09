@@ -32,6 +32,11 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "parser.fullname" . }}
+          volumeMounts:
+            - name: google-translate-key
+              mountPath: "/var/www/config/google-translate-credentials.json"
+              subPath: "google-translate-credentials.json"
+              readOnly: true
           lifecycle:
             postStart:
               exec:
@@ -49,6 +54,13 @@ spec:
 #              port: http
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: google-translate-key
+          secret:
+            secretName: {{ include "parser.fullname" . }}-google-translate-key
+            items:
+                - key: google-translate-credentials.json
+                  path: google-translate-credentials.json
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

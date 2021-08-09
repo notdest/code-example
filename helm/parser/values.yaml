@@ -51,6 +51,11 @@ env:
 
   IMAGE_BUCKET: im-parser
 
+googleTranslateKey:
+  externalSecret: true
+  key: parser-google-translate
+  version: 1
+
 db:
   migrations: true
 
