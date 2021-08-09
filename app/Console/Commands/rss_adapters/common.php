@@ -43,13 +43,15 @@ class common{
     }
 
 
-    private function getDefaultItem(){
+    protected function getDefaultItem(){
         $item   = new \stdClass();
         $item->pubDate      = '';
         $item->title        = '';
+        $item->foreignTitle = '';
         $item->link         = '';
         $item->categories   = [];
         $item->externalId   = '';
+        $item->translate    = 0;
         return $item;
     }
 }

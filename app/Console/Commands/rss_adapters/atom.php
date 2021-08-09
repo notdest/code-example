@@ -3,7 +3,7 @@ namespace App\Console\Commands\rss_adapters;
 
 use Illuminate\Support\Carbon;
 
-class atom{
+class atom extends common{
 
 
     public function getItems($xml){
@@ -26,17 +26,6 @@ class atom{
             $item->categories[] = reset($category)['term'];
         }
 
-        return $item;
-    }
-
-
-    private function getDefaultItem(){
-        $item   = new \stdClass();
-        $item->pubDate      = '';
-        $item->title        = '';
-        $item->link         = '';
-        $item->categories   = [];
-        $item->externalId   = '';
         return $item;
     }
 }

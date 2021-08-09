@@ -10,7 +10,7 @@ class RssSource extends Model
     public $timestamps  = false;
 
     protected $fillable = [
-        'name', 'link', 'active', 'adapter'
+        'name', 'link', 'active', 'adapter','foreign'
     ];
 
     const STREAM_COSMO      = 1;
@@ -32,12 +32,14 @@ class RssSource extends Model
     ];
 
     public static $fieldNames = [
-        'id'        => 'Id',
-        'name'      => 'Название',
-        'link'      => 'Ссылка',
-        'stream'    => 'Потоки',
-        'active'    => 'Статус',
-        'adapter'   => 'Адаптер',
+        'id'                    => 'Id',
+        'name'                  => 'Название',
+        'link'                  => 'Ссылка',
+        'stream'                => 'Потоки',
+        'active'                => 'Статус',
+        'adapter'               => 'Адаптер',
+        'foreign'               => 'Страна',
+        'default_categories'    => 'Категории по умолчанию',
     ];
 
     public function getStreamsAttribute():array{
