@@ -12,6 +12,8 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+gcpProjectId: "feshn-press-llc"
+
 env:
   APP_NAME: "parser"
   APP_ENV: "local"
