@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command("rss:import")                   ->everyFifteenMinutes()->withoutOverlapping(120);
 
+        $schedule->command("run:void parseEvents")         ->dailyAt('4:07');
         $schedule->command("Instagram:clearCache  5")      ->monthlyOn(2, '4:21');
     }
 
