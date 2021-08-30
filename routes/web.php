@@ -69,4 +69,6 @@ Route::get('/',                         'UserController@defaultPage')->middlewar
 Route::get('/trends/',                  'TrendController@index');
 Route::get('/trends/download/',         'TrendController@download');
 
+Route::get('/calendar/',                'CalendarController@index');
+
 Auth::routes(['register' => false,'reset' => false]);
