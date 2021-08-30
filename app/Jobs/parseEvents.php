@@ -33,7 +33,7 @@ class parseEvents implements ShouldQueue
             }
         }
 
-        $endLimit   = strtotime('-2 day');
+        $endLimit   = strtotime('-5 day');
         foreach ($events as $event) {
             if(strlen($event->end)>0){
                 $end = strtotime($event->end);
