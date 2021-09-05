@@ -91,7 +91,7 @@ class parseInstagramQuick implements ShouldQueue
             $newRow = [
                 'postId'        => $post->getShortCode(),
                 'numericalId'   => $post->getId(),
-                'createdTime'   => date("Y-m-d H:i:s",$post->getCreatedTime()+(3*3600)),
+                'createdTime'   => date("Y-m-d H:i:s",$post->getCreatedTime()),
                 'text'          => $post->getCaption(),
                 'image'         => '/'.$cacheDir."/".$post->getShortCode().".jpg",
             ];
