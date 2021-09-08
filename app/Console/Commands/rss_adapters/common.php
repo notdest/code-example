@@ -18,7 +18,7 @@ class common{
     public function extractItem($rawItem,$sourceId){
         $item   = $this->getDefaultItem();
 
-        $item->pubDate      = isset($rawItem->pubDate)  ? Carbon::parse($rawItem->pubDate)->format('Y-m-d H:i:s') : null;
+        $item->pubDate      = isset($rawItem->pubDate)  ? Carbon::parse($rawItem->pubDate)->tz('Europe/Moscow')->format('Y-m-d H:i:s') : null;
         $item->title        = isset($rawItem->title)    ? reset($rawItem->title): '';
         $item->link         = isset($rawItem->link)     ? reset($rawItem->link) : '';
 
