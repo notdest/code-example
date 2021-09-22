@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'can:post-viewer'])->group(function () {
     Route::get('/posts/',               'PostController@index');
+    Route::get('/stories/',             'StoryController@index');
     Route::get('/sources/',             'SourceController@index');
     Route::get('/persons/',             'PersonController@index');
 });
