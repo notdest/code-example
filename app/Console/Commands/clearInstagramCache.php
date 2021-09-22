@@ -63,6 +63,7 @@ class clearInstagramCache extends Command
 
                                                                                 // Потом удаляем старые посты
         DB::table('posts')->where('createdTime','<',date("Y-m-1 00:00:00",strtotime("-".($months-1)." month")))->delete();
+        DB::table('stories')->where('createdTime','<',date("Y-m-1 00:00:00",strtotime("-".($months-1)." month")))->delete();
 
         return 0;
     }

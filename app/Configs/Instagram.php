@@ -17,6 +17,8 @@ class Instagram extends Config
     public $emails              = '';
     public $enableSubscription  = 0;
     public $feedMaxPages        = 1;
+    public $notes               = '';
+    public $enableStories       = 0;
 
     // Технические параметры, они не видны на странице настроек
     public $lastSubscribe   = 0;    // timeStamp когда в последний раз пытались подписываться на персон
@@ -40,6 +42,8 @@ class Instagram extends Config
             'lastSubscribe'         => 'Время последнего подписывания',
             'errors'                => 'Ошибок авторизации подряд',
             'feedMaxPages'          => 'Максимум загружаемых страниц',
+            'enableStories'         => 'Скачивать сторис',
+            'notes'                 => 'Заметки',
         ];
     }
 

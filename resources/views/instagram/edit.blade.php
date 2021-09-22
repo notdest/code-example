@@ -65,11 +65,14 @@
 
         <script type="text/javascript">
             function checkSubscribed(){
-                $("#subscribedButton").attr('disabled','disabled');
-                $.get( "/instagram/check-subscribed/", function( data ) {
-                    $("#subscribedButton").removeAttr('disabled');
-                    $( "#subscribedCount" ).text(data);
-                });
+                let confirmed  = confirm('Это ресурсоёмкая задача, запускаем?');
+                if(confirmed){
+                    $("#subscribedButton").attr('disabled', 'disabled');
+                    $.get("/instagram/check-subscribed/", function (data) {
+                        $("#subscribedButton").removeAttr('disabled');
+                        $("#subscribedCount").text(data);
+                    });
+                }
             }
         </script>
         <div class="form-group">
@@ -125,6 +128,24 @@
         </div>
         <pre id="lostPosts"> </pre>
 
+        <div class="form-group">
+            <label for="config_enableStories" >{{ $config->fieldName('enableStories') }}</label>
+            <div id="config_enableStories">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="enableStories" id="config_enableStories1" value="0" {{ ($config->enableStories == 0) ? 'checked':'' }}>
+                    <span>Выключен</span>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="enableStories" id="config_enableStories2" value="1" {{ ($config->enableStories != 0) ? 'checked':'' }}>
+                    <span>Включен</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="config_notes" >{{ $config->fieldName('notes') }}</label>
+            <textarea class="form-control" id="config_notes" name="notes"  rows="15">{{ $config->notes }}</textarea>
+        </div>
         @csrf
         <input type="submit" value="Сохранить" class="btn btn-success">
     </form>

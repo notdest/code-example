@@ -11,7 +11,7 @@ use InstagramScraper\Exception\InstagramException;
 
 class InstagramController extends Controller
 {
-    public static $latch = '/var/www/storage/app/public/lost_posts_latch.txt';
+    public static $latch = '/var/www/public/img_cache/lost_posts_latch.txt';
 
 
 
@@ -30,6 +30,7 @@ class InstagramController extends Controller
         $fields = $request->except('_token');
         $validator  = \Validator::make($fields,[
             'enabled'       => 'boolean',
+            'enableStories' => 'boolean',
             'feedMaxPages'  => 'required|int',
             'emails'        => ['required', function ($attribute, $value, $fail)use($config) {
                 $addresses  = explode(',',$value);
@@ -114,7 +115,7 @@ class InstagramController extends Controller
     }
 
     public function showLostPosts(){
-        $file = '/var/www/storage/app/public/lost_posts.txt';
+        $file = '/var/www/public/img_cache/lost_posts.txt';
         if(!file_exists($file)){
             return "Не найден файл с результатом";
         }else{

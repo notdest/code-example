@@ -71,9 +71,9 @@ class InstagramLostPosts implements ShouldQueue
             echo $text;
         }else{
             if($first){
-                file_put_contents('/var/www/storage/app/public/lost_posts.txt',$text);
+                file_put_contents('/var/www/public/img_cache/lost_posts.txt',$text);
             }else{
-                file_put_contents('/var/www/storage/app/public/lost_posts.txt',$text,FILE_APPEND);
+                file_put_contents('/var/www/public/img_cache/lost_posts.txt',$text,FILE_APPEND);
             }
         }
     }
