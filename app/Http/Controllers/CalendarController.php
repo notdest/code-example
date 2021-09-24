@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use \App\Event;
+use \App\{Event,RegularEvent};
 
 class CalendarController extends Controller
 {
@@ -19,6 +19,10 @@ class CalendarController extends Controller
 
         $db = $db->orderBy('start', 'asc');
         $events = $db->take(1000)->get();
+        $events = $events->concat(RegularEvent::getComingMonths(3,$search));
+        $events = $events->sortBy(function ($event, $key) {
+            return strtotime($event->start);
+        });
 
         return view('calendar.index',[
             'events'    => $events,
