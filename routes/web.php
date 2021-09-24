@@ -64,6 +64,11 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/rss-sources/create/',         'RssSourceController@store');
     Route::get( '/rss-sources/edit/{id}/',      'RssSourceController@edit');
     Route::post('/rss-sources/edit/{id}/',      'RssSourceController@save');
+
+    Route::get( '/regular-events/',             'RegularEventController@index');
+    Route::post('/regular-events/tsv/',         'RegularEventController@tsv');
+    Route::get( '/regular-events/delete/{id}/', 'RegularEventController@delete');
+    Route::post('/regular-events/save/',        'RegularEventController@save');
 });
 
 Route::get('/',                         'UserController@defaultPage')->middleware('auth');
