@@ -20,7 +20,7 @@ class parseEvents implements ShouldQueue
     public function handle()
     {
         $httpClient = new \GuzzleHttp\Client();
-        $response   = $httpClient->request('GET', 'https://setters.agency/calendar');
+        $response   = $httpClient->request('GET', 'https://old.setters.agency/calendar');
         $html       = $response->getBody()->getContents();
 
         $events     = $this->extractEvents($html);
