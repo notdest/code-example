@@ -71,8 +71,10 @@
                     @php
                         $search->person = $story->personId;
                     @endphp
-                    <a href="https://www.instagram.com/{!! $story->code !!}/"  target="_blank">{{ $story->name }}</a>
-                    <a href="/stories/?{!! http_build_query($search) !!}" ><img src="/img/loupe.png" style="height: 1em;"></a>
+                    @if($story->code !== 'default')
+                        <a href="https://www.instagram.com/{!! $story->code !!}/"  target="_blank">{{ $story->name }}</a>
+                        <a href="/stories/?{!! http_build_query($search) !!}" ><img src="/img/loupe.png" style="height: 1em;"></a>
+                    @endif
                 </h5>
                 <h6 class="card-subtitle mb-2 text-muted">{{ $story->createdTime }} ({{($story->type == \App\Http\Controllers\StoryController::PHOTO) ? "Фото":"Видео ".$story->duration." сек." }})</h6>
                 <div class="overflow-auto card-text">

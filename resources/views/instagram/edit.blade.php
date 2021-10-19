@@ -27,7 +27,7 @@
             <input type="text" class="form-control" id="config_login" name="login" value="{{ $config->login }}">
         </div>
 
-        <div class="form-group">
+        <div class="form-group  d-none">
             <label for="config_password" >{{ $config->fieldName('password') }}</label>
             <input type="text" class="form-control" id="config_password" name="password" value="{{ $config->password }}">
         </div>
@@ -37,22 +37,7 @@
             <input type="text" class="form-control" id="config_session" name="session" value="{{ $config->session }}">
         </div>
 
-        <div class="form-group">
-            <label for="config_enabled" >{{ $config->fieldName('enabled') }}</label>
-
-            <div id="config_enabled">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="enabled" id="config_enabled1" value="0" {{ ($config->enabled == 0) ? 'checked':'' }}>
-                    <span>Выключен</span>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="enabled" id="config_enabled2" value="1" {{ ($config->enabled != 0) ? 'checked':'' }}>
-                    <span>Включен</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
+        <div class="form-group d-none">
             <label for="config_proxy" >{{ $config->fieldName('proxy') }}</label>
             <input type="text" class="form-control" id="config_proxy" name="proxy" value="{{ $config->proxy }}">
         </div>
@@ -75,14 +60,14 @@
                 }
             }
         </script>
-        <div class="form-group">
+        <div class="form-group d-none">
             <button type="button" class="btn btn-dark" onclick="checkSubscribed();" id="subscribedButton">
                 Проверить количество подписанных
             </button>
             <span id="subscribedCount" class="ml-3">..... из .....</span>
         </div>
 
-        <div class="form-group">
+        <div class="form-group d-none">
             <label for="config_enableSubscription" >{{ $config->fieldName('enableSubscription') }}</label>
 
             <div id="config_enableSubscription">
@@ -98,7 +83,7 @@
         </div>
 
 
-        <div class="form-group">
+        <div class="form-group d-none">
             <label for="config_feed_pages" >{{ $config->fieldName('feedMaxPages') }}</label>
             <input type="text" class="form-control" id="config_feed_pages" name="feedMaxPages" value="{{ $config->feedMaxPages }}">
         </div>
@@ -118,7 +103,7 @@
                 }
             }
         </script>
-        <div class="form-group">
+        <div class="form-group d-none">
             <button type="button" class="btn btn-dark" onclick="checkLostPosts()" id="checkLostButton" {{ $lostChecking ? 'disabled' : '' }}>
                 Проверка пропущенных постов
             </button>
@@ -127,6 +112,21 @@
             </button>
         </div>
         <pre id="lostPosts"> </pre>
+
+        <div class="form-group">
+            <label for="config_enabled" >{{ $config->fieldName('enabled') }}</label>
+
+            <div id="config_enabled">
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="enabled" id="config_enabled1" value="0" {{ ($config->enabled == 0) ? 'checked':'' }}>
+                    <span>Выключен</span>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="enabled" id="config_enabled2" value="1" {{ ($config->enabled != 0) ? 'checked':'' }}>
+                    <span>Включен</span>
+                </div>
+            </div>
+        </div>
 
         <div class="form-group">
             <label for="config_enableStories" >{{ $config->fieldName('enableStories') }}</label>

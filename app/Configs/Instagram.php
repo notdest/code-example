@@ -32,10 +32,10 @@ class Instagram extends Config
 
     protected function fieldNames():array{
         return [
-            'login'                 => 'Логин',
+            'login'                 => 'Логин (legacy)',
             'password'              => 'Пароль',
-            'session'               => 'Сессия',
-            'enabled'               => 'Состояние',
+            'session'               => 'Сессия (legacy)',
+            'enabled'               => 'Скачивание постов',
             'proxy'                 => 'Прокси',
             'emails'                => 'Почта для оповещений',
             'enableSubscription'    => 'Включено подписывание',
