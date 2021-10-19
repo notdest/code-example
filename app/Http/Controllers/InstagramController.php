@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\InstagramSessionExpired;
 use InstagramScraper\Exception\InstagramException;
+use InstagramScraper\Exception\InstagramNotFoundException;
 
 
 class InstagramController extends Controller
@@ -63,6 +64,34 @@ class InstagramController extends Controller
             'lostChecking'  => $this->latchLocked(),
         ]);
 
+    }
+
+    /*
+        Этот метод доступен только по URL (/instagram/fill-users-id/), интерфейс не делал
+        Проставляет численные id пользователей инсты. В идеале потом встроить в редактирование пользователей
+        и перевести на платные API вместо использования нашего пользователя */
+    public function fillUsersId(){
+        $config     = new \App\Configs\Instagram();
+        $instagram  = $config->getClient();
+
+        $sources = \App\Source::where('type','=','instagram')
+                                ->where('active','>','0')
+                                ->where('userId','=','0')
+                                ->take(20)->get();
+
+        foreach ($sources as $source) {
+            echo $source->code."\n";
+            try {
+                $akk  =   $instagram->getAccount($source->code);                           // скачиваем 20 постов
+            }catch (InstagramNotFoundException $e){
+                echo "\n\n '{$source->code}' Not found \n\n";
+                continue;
+            }
+            $source->userId = $akk->getId();
+            $source->save();
+            sleep(1);
+        }
+        return "";
     }
 
     public function checkEmail(){

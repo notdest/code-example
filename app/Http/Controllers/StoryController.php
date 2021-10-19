@@ -37,7 +37,7 @@ class StoryController extends Controller
             'stories'   => $stories,
             'persons'   => $persons,
             'search'    => $search,
-            'enabled'   => ($config->enabled && $config->enableStories),
+            'enabled'   => $config->enableStories,
         ]);
     }
 }
