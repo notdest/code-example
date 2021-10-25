@@ -99,6 +99,8 @@ class ExternalRssImport extends Command
         foreach ($exceptions as $exception) {   // когда отработали сообщаем об ошибках в логгер
             throw $exception;
         }
+
+        return Command::SUCCESS;
     }
 
     private function itemSave($item){
