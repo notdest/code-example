@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Jenssegers\Date\Date;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,5 +26,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Date::setlocale(config('app.locale'));
+        Paginator::useBootstrap();
     }
 }

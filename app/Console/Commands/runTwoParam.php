@@ -4,21 +4,21 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
-class runVoid extends Command
+class runTwoParam extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'run:void {job=0} {--t|time}';
+    protected $signature = 'run:twoParam {job=0} {first=-1} {second=-1} {--t|time}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Запускает задачу в очередь без параметров';
+    protected $description = 'Запускает задачу в очередь с двумя параметрами';
 
     /**
      * Create a new command instance.
@@ -33,24 +33,26 @@ class runVoid extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return int
      */
     public function handle()
     {
         $job    = $this->argument('job');
+        $first  = $this->argument('first');
+        $second = $this->argument('second');
 
-        if($job){
+        if($job && ($first > -1) && ($second > -1)){
             $time   = $this->option('time');
             if($time){
                 echo date("Y-m-d H:i:s\n");
             }
             $class  = "\App\Jobs\\$job";
-            dispatch( new $class());
+            dispatch( new $class($first,$second));
             if($time){
                 echo date("Y-m-d H:i:s\n");
             }
         }else{
-            echo "Не указана job-класс\n";
+            echo "Переданы не все параметры\n";
         }
 
         return Command::SUCCESS;

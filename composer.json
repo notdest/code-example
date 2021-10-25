@@ -15,12 +15,12 @@
         "google/cloud-translate": "^1.10",
         "guzzlehttp/guzzle": "^7.2",
         "jenssegers/date": "^4.0",
-        "laravel/framework": "^7.0",
+        "laravel/framework": "^8.65",
         "laravel/tinker": "^2.0",
-        "laravel/ui": "^2.5",
+        "laravel/ui": "^3.3",
         "phpfastcache/phpfastcache": "^8.0",
         "phpoffice/phpspreadsheet": "^1.15",
-        "raiym/instagram-php-scraper": "dev-master#4706712bdbedf32161788e092e4ecf656b521e14",
+        "raiym/instagram-php-scraper": "^0.12.0",
         "sentry/sentry-laravel": "^2.3"
     },
     "require-dev": {

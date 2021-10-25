@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 
@@ -26,6 +27,10 @@ class instagramApiPosts implements ShouldQueue
         //
     }
 
+    public function middleware()
+    {
+        return [(new WithoutOverlapping())->dontRelease()->expireAfter(1800)];
+    }
     /**
      * Execute the job.
      *
@@ -76,7 +81,7 @@ class instagramApiPosts implements ShouldQueue
                     'numericalId'   => $post->node->id,
                     'postId'        => $post->node->shortcode,
                     'createdTime'   => date("Y-m-d H:i:s",$post->node->taken_at_timestamp),
-                    'text'          => $post->node->edge_media_to_caption->edges[0]->node->text,
+                    'text'          => $post->node->edge_media_to_caption->edges[0]->node->text ?? '',
                     'image'         => $image,
                 ];
 
