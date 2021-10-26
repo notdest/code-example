@@ -32,6 +32,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "parser.fullname" . }}
+            - secretRef:
+                name: {{ include "parser.fullname" . }}-secret
           volumeMounts:
             - name: google-translate-key
               mountPath: "/var/www/config/google-translate-credentials.json"
