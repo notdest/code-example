@@ -41,7 +41,7 @@ class Instagram extends Config
             'enableSubscription'    => 'Включено подписывание',
             'lastSubscribe'         => 'Время последнего подписывания',
             'errors'                => 'Ошибок авторизации подряд',
-            'feedMaxPages'          => 'Максимум загружаемых страниц',
+            'feedMaxPages'          => 'Ограничение постов в минуту',
             'enableStories'         => 'Скачивать сторис',
             'notes'                 => 'Заметки',
         ];
