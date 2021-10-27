@@ -14,6 +14,8 @@ class instagramApiPosts implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public $tries = 1;
+
     protected $baseDir = '/var/www/public/';
     protected $cacheDir;
     protected $httpClient;
@@ -29,7 +31,7 @@ class instagramApiPosts implements ShouldQueue
 
     public function middleware()
     {
-        return [(new WithoutOverlapping())->dontRelease()->expireAfter(1800)];
+        return [(new WithoutOverlapping())->dontRelease()->expireAfter(600)];
     }
     /**
      * Execute the job.
@@ -39,6 +41,7 @@ class instagramApiPosts implements ShouldQueue
     public function handle()
     {
         $token  = env('RAPIDAPI_TOKEN');
+        $startTime  = time();
 
         $config     = new \App\Configs\Instagram();
 
@@ -53,14 +56,19 @@ class instagramApiPosts implements ShouldQueue
 
         $allSources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active`>0 AND `userId` >0 ORDER BY `id` ;");
 
-        $length = 19 ;                                      // разбиваем источники на максимально равные куски в рамках предела
+        $length = intval($config->feedMaxPages );                   // разбиваем источники на максимально равные куски в рамках предела
         $count  = ceil(count($allSources)/$length);
         $chunks = array_chunk($allSources, ceil(count($allSources)/$count)  );
 
         $minutes    = ( (date('j')*24)+date('G') )*60 + date('i');  // берем кусок в зависимости от минуты месяца
         $sources    = $chunks[$minutes % $count];
 
-        foreach ($sources as $source) {
+        foreach ($sources as $key => $source) {
+            $time   = time()-$startTime;
+            if($time < ($key*3)){
+                sleep(($key*3)-$time);
+            }
+
             $url    = "https://instagram39.p.rapidapi.com/getFeed?user_id={$source->userId}";
 
             $response   = $this->httpClient->request('GET', $url, ['headers' => $headers])->getBody();;
