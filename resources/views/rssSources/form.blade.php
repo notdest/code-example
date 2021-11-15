@@ -6,6 +6,11 @@
     $adapters   = scandir(app_path('Console/Commands/rss_adapters/'));
     $adapters   = array_filter($adapters,function($v){ return !in_array($v,['..','.']);});
     $adapters   = array_map(function ($v){return str_replace('.php','',$v);},$adapters);
+
+    $textAdapters   = scandir(app_path('Jobs/rss_text_adapters/'));
+    $textAdapters   = array_filter($textAdapters,function($v){ return !in_array($v,['..','.']);});
+    $textAdapters   = array_map(function ($v){return str_replace('.php','',$v);},$textAdapters);
+    $textAdapters   = array_merge([''],$textAdapters);
 @endphp
 
 @if ($errors->any())
@@ -99,6 +104,16 @@
             </div>
         </div>
     </div>
+
+    <div class="form-group">
+        <label for="source_text_adapter" >{{ $fields['text_adapter'] }}</label>
+        <select class="form-control form-control-sm" id="source_text_adapter" name="text_adapter">
+            @foreach($textAdapters as $adapter)
+                <option value="{{$adapter}}" {{ ($source->text_adapter == $adapter) ? 'selected':'' }}>{{$adapter}}</option>
+            @endforeach
+        </select>
+    </div>
+
     @csrf
     <input type="submit" value="Сохранить" class="btn btn-success">
 </form>
