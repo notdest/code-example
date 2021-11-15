@@ -150,6 +150,9 @@
                         @if(strlen($prompt)>0)
                             <img src="/img/help.png" style="height: 1em;" data-toggle="tooltip" title="{{ $prompt }}">
                         @endif
+                        @if(strlen($article->original_text)>0)
+                            <a href="/articles/text/{{$article->id}}/" title="Текст статьи" class="ml-2"><img src="/img/text.png" style="height: 1.5em;" ></a>
+                        @endif
                     </td>
                     <td>{{ $article->source->name }}</td>
                     <td>{{ $article->pub_date }}</td>

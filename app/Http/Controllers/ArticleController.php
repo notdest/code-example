@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Google\Cloud\Translate\V3\TranslationServiceClient;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\{IOFactory,Spreadsheet};
 use Illuminate\Support\Facades\DB;
+use function GuzzleHttp\Psr7\str;
 
 class ArticleController extends Controller
 {
@@ -21,6 +23,60 @@ class ArticleController extends Controller
         ]);
     }
 
+
+    public function text(Request $request){
+        return view('articles.text',[
+            'article'   => \App\Article::findOrFail((int) $request->id),
+        ]);
+    }
+
+
+    public function translate(Request $request){
+        $article    = \App\Article::findOrFail((int) $request->id);
+
+        if((strlen($article->translated_text)>0)&&(strlen($article->title)>0)){
+            return [
+                'success'           => true,
+                'translatedTitle'   => $article->title,
+                'translatedText'    => str_replace("\n","<br>\n",$article->translated_text),
+            ];
+        }
+
+        $translationClient = new TranslationServiceClient([
+            'credentials' => config_path('google-translate-credentials.json'),
+        ]);
+        $parent = TranslationServiceClient::locationName(app('config')['common.translate.projectId'], 'global');
+
+        if(!strlen($article->title) && strlen(trim($article->foreign_title))){
+            $translations   = $translationClient->translateText([$article->foreign_title], 'ru', $parent)->getTranslations();
+            $article->title = $translations[0]->getTranslatedText();
+            $article->save();
+        }
+
+        if(!strlen($article->translated_text) && strlen(trim($article->original_text))){
+            $strings    = explode("\n",$article->original_text);            // режет переносы строки, приходится самому воспроизводить
+            $filtered   = array_filter($strings,function ($v){ return strlen(trim($v))>0 ;});
+            $translations   = $translationClient->translateText($filtered, 'ru', $parent)->getTranslations();
+
+            $i  = 0;
+            foreach ($strings as $string) {
+                if(strlen(trim($string))>0){
+                    $article->translated_text .= $translations[$i]->getTranslatedText()."\n";
+                    $i++;
+                }else{
+                    $article->translated_text .= $string."\n";
+                }
+            }
+            $article->save();
+        }
+
+        $translationClient->close();
+        return [
+            'success'           => true,
+            'translatedTitle'   => $article->title,
+            'translatedText'    => str_replace("\n","<br>\n",$article->translated_text),
+        ];
+    }
 
 
     public function download(Request $request){
