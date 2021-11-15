@@ -1,7 +1,7 @@
 <?php
 namespace App\Console\Commands\rss_adapters;
 
-class foreign_common extends common {
+class text_in_description extends common {
 
     public function filter($xml){
         return $xml;
@@ -12,13 +12,7 @@ class foreign_common extends common {
         $item->foreignTitle = $item->title;
         $item->title        = '';
 
-
-        $additional = $rawItem->children('content',true);
-        if(isset($additional->encoded)){
-            $item->original_text    = strip_tags($additional->encoded);
-            $item->original_text    = str_replace("\t","",$item->original_text);
-            $item->original_text    = trim(preg_replace("/\n{3,}/","\n\n",$item->original_text));
-        }
+        $item->original_text = trim(strip_tags($rawItem->description));
 
         return $item;
     }
