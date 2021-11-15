@@ -10,7 +10,7 @@ class RssSource extends Model
     public $timestamps  = false;
 
     protected $fillable = [
-        'name', 'link', 'active', 'adapter','foreign'
+        'name', 'link', 'active', 'adapter','foreign','text_adapter'
     ];
 
     const STREAM_COSMO      = 1;
@@ -40,6 +40,7 @@ class RssSource extends Model
         'adapter'               => 'Адаптер',
         'foreign'               => 'Страна',
         'default_categories'    => 'Категории по умолчанию',
+        'text_adapter'          => 'Адаптер скачивания текстов',
     ];
 
     public function getStreamsAttribute():array{

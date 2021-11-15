@@ -52,6 +52,8 @@ class common{
         $item->categories   = [];
         $item->externalId   = '';
         $item->translate    = 0;
+        $item->original_text    = '';
+        $item->translated_text  = '';
         return $item;
     }
 }

@@ -30,9 +30,10 @@ class ExternalRssImport extends Command
 
         $classifier = RssCategory::getClassifier();
 
-        $httpClient = new \GuzzleHttp\Client();
-        $exceptions = [];
-        $translate  = false;
+        $httpClient     = new \GuzzleHttp\Client();
+        $exceptions     = [];
+        $translate      = false;
+        $downloadTexts  = false;
 
         foreach ($sources as $source ) {
             $class      = '\App\Console\Commands\rss_adapters\\'.$source->adapter;
@@ -67,6 +68,10 @@ class ExternalRssImport extends Command
                             $translate = true;
                         }
 
+                        if(strlen($source->text_adapter) > 0 ){
+                            $downloadTexts  = true;
+                        }
+
                         $this->itemSave([
                             'pub_date'              => $item->pubDate,
                             'source_id'             => $source->id,
@@ -77,6 +82,8 @@ class ExternalRssImport extends Command
                             'unknown_categories'    => mb_substr( implode(', ',$unknown) ,0,255,'UTF-8'),
                             'external_id'           => $item->externalId,
                             'translate'             => $item->translate,
+                            'original_text'         => $item->original_text,
+                            'translated_text'       => $item->translated_text,
                         ]);
                     }
 
@@ -94,6 +101,10 @@ class ExternalRssImport extends Command
 
         if($translate){
             dispatch( new \App\Jobs\translateRss());
+        }
+
+        if($downloadTexts){
+            dispatch( new \App\Jobs\downloadRssText());
         }
 
         foreach ($exceptions as $exception) {   // когда отработали сообщаем об ошибках в логгер
