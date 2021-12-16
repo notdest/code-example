@@ -105,13 +105,15 @@ service:
 
 ingress:
   enabled: true
+  className: traefik
   annotations:
     kubernetes.io/ingress.class: traefik
     # kubernetes.io/tls-acme: "true"
   hosts:
     - host: parser.fppressa.ru
       paths:
-        - /
+        - path: /
+          pathType: Prefix
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
