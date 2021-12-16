@@ -26,7 +26,7 @@ build:
     - default
 
 Deploy to gke:
-  image: kiwigrid/gcloud-kubectl-helm:3.1.1-282.0.0-240
+  image: eu.gcr.io/feshn-press-llc/gcloud-kubectl-helm:0.2.0
   stage: deploy
   before_script:
     - echo "$GKE_KEY" > gke_key.json
