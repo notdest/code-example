@@ -41,7 +41,14 @@ Route::middleware(['auth', 'can:article-viewer'])->group(function () {
     Route::get('/articles/download/',       'ArticleController@download');
     Route::get('/articles/text/{id}/',      'ArticleController@text');
     Route::get('/articles/translate/{id}/', 'ArticleController@translate');
+
+    Route::get('/articles-rewrite/',                    'ArticleRewriteController@index');
+    Route::get('/articles-rewrite/text/{id}/',          'ArticleRewriteController@text');
+    Route::get('/articles-rewrite/translate/{id}/',     'ArticleRewriteController@translate');
+    Route::get('/articles-rewrite/translate-titles/',   'ArticleRewriteController@translateTitles');
 });
+    Route::post('/articles-rewrite/save-article/',      'ArticleRewriteController@saveArticle')->middleware(['auth.basic.once','can:admin']);
+    Route::get('/articles-rewrite/parse-article/',      'ArticleRewriteController@parseArticle');
 
 Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::get('/users/',               'UserController@index');
