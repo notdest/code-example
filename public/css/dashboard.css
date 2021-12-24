@@ -35,6 +35,12 @@ label{
   box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
 }
 
+.sticky-top-header{
+    background-color: #FFFFFF;
+    z-index: 1010;
+    padding-top: 3.5em;
+}
+
 @media (max-width: 767.98px) {
   .sidebar {
     top: 5rem;
