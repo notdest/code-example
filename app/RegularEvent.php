@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RegularEvent extends Model
 {
+    private $year   = 0;
 
     /*
         !!!!!!!!!!! год приводим к 2020 в БД !!!!!!!!!!
@@ -14,10 +15,10 @@ class RegularEvent extends Model
         собственный тип данных с датой, поэтому используем стандартный DATETIME, у всех дат год приводим к 2020 в БД,
         и к текущему году в объектах. Все эти действия я пытаюсь спрятать в этом классе
      */
-    public static function getComingMonths($months,$search){
-        $endMonth = intval(date('n')) + $months;
+    public static function getMonth($search){
+        $endMonth = $search->month + 1;
 
-        $db     = self::where('end','>=',date('2020-m-d 00:00:00',strtotime('-1 day')) );
+        $db     = self::where('end', '>=',"2020-{$search->month}-01 00:00:00" );
         $db     = $db->where('start','<',($endMonth>12) ? "2021-01-01 00:00:00":"2020-{$endMonth}-01 00:00:00");
 
         if($search->category > 0){
@@ -27,19 +28,9 @@ class RegularEvent extends Model
         $db     = $db->orderBy('start', 'asc');
         $events = $db->get();
 
-        if($endMonth > 13){                 // добираем месяцы в следующем году
-            $endMonth   -= 12;
-            $db2    = self::where('end','>=','2020-01-01 00:00:00');
-            $db2    = $db2->where('start','<',"2020-{$endMonth}-01 00:00:00");
-
-            if($search->category > 0){
-                $db2 = $db2->where('category', $search->category);
-            }
-
-            $db2    = $db2->orderBy('start', 'asc');
-            $events = $events->concat($db2->get());
-        }
-
+        $events->each(function ($item,$key) use($search){
+            $item->setYear($search->year);
+        });
         return $events;
     }
 
@@ -59,11 +50,14 @@ class RegularEvent extends Model
         $this->attributes['end']    = $this->translateInputDate($value,'23:59:59');
     }
 
+    public function setYear(int $year){
+        $this->year = $year;
+    }
+
     protected function translateOutputDate($inputDate){
         $time   = strtotime($inputDate);
-        $currentYear = (intval(date('n',$time))+1) >= intval(date('n'));
 
-        return ($currentYear ?  date('Y'):  date('Y')+1).date('-m-d H:i:s',$time);
+        return ($this->year > 0) ? $this->year.date('-m-d H:i:s',$time) : date('Y').date('-m-d H:i:s',$time);
     }
 
     protected function translateInputDate($inputDate,$suffix){

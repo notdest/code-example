@@ -17,7 +17,7 @@
     <link href="/css/dashboard.css" rel="stylesheet">
 </head>
 
-<body>
+<body @yield('body-params')>
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0 shadow">
     <a class="navbar-brand col-md-3 col-lg-2 mr-0 px-3" href="#">Independent Media</a>
     <button class="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,12 @@
 
             </div>
         </nav>
+
+        @hasSection('sticky-top')
+            <div class="col-md-9 ml-sm-auto col-lg-10 fixed-top  sticky-top-header border-bottom">
+                @yield('sticky-top')
+            </div>
+        @endif
 
         <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
 
