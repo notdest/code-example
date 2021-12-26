@@ -4,15 +4,32 @@ namespace App\Http\Controllers;
 
 use Google\Cloud\Translate\V3\TranslationServiceClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ArticleRewriteController extends Controller
 {
-    public function index(){
+    public function index(Request $request){
+        $search             = new \stdClass();
+        $search->translate  = (int) ($request->translate    ?? 1); // влияет только на отображение
+        $search->source     =        $request->source       ?? '';
+
+        $sources    = DB::table('articles_rewrite')->select('source')->distinct()->orderBy('source')->pluck('source')->all();
+        if(!in_array($search->source,$sources)){
+            $search->source = '';
+        }
+
         $db         = \App\ArticleRewrite::orderBy('id', 'desc');
+
+        if(strlen($search->source)>0){
+            $db = $db->where('source',$search->source);
+        }
+
         $articles   = $db->paginate(500);
 
         return view('articlesRewrite.index',[
             'articles'  => $articles,
+            'search'    => $search,
+            'sources'   => $sources,
         ]);
     }
 
@@ -121,6 +138,7 @@ class ArticleRewriteController extends Controller
 
         $validator  = \Validator::make($fields,[
             'link'              => 'required|unique:App\ArticleRewrite,link',
+            'source'            => 'required',
             'title'             => 'required_without:foreign_title',
             'foreign_title'     => 'required_without:title',
             'original_text'     => 'required_without:translated_text',
@@ -159,6 +177,7 @@ class ArticleRewriteController extends Controller
 
         $article                    = new \StdClass();
         $article->title             = "";
+        $article->source            = "";
         $article->foreign_title     = "";
         $article->link              = $page;
         $article->original_text     = "";
@@ -192,6 +211,8 @@ class ArticleRewriteController extends Controller
 
     private function parse($html,&$article){
         // Пример адаптера для www.psychologytoday.com
+        $article->source    = "Psychologytoday.com";
+
         $pos    = strpos($html,'<div id="block-pt-content"');                   // Обрезаем всё кроме тела статьи
         if($pos === false){
             throw new \Exception('Can\'t found "block-pt-content"');

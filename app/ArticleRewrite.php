@@ -12,6 +12,6 @@ class ArticleRewrite extends Model
 
     protected $table    = 'articles_rewrite';
     protected $fillable = [
-        'title', 'foreign_title', 'link', 'original_text', 'translated_text'
+        'title', 'foreign_title', 'link', 'original_text', 'translated_text', 'source'
     ];
 }
