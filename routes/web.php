@@ -56,6 +56,7 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/users/create/',       'UserController@store');
     Route::get('/users/edit/{id}/',     'UserController@edit');
     Route::post('/users/edit/{id}/',    'UserController@save');
+    Route::get('/users/token/{id}/',    'UserController@token');
 
     Route::get( '/instagram/edit/',             'InstagramController@edit');
     Route::post('/instagram/edit/',             'InstagramController@save');

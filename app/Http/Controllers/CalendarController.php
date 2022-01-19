@@ -8,11 +8,48 @@ use \App\{Event,RegularEvent};
 class CalendarController extends Controller
 {
     public function index(Request $request){
+        $search = $this->getSearch($request);
+        $events = $this->getEvents($search);
+
+        $days   = [];
+        foreach ($events as $event) {
+            $days[] = date('j',strtotime($event->start));
+        }
+        $days   = array_unique($days);
+        sort($days);
+
+        return view('calendar.index',[
+            'events'    => $events,
+            'days'      => $days,
+            'search'    => $search,
+        ]);
+    }
+
+    public function apiIndex(Request $request){
+        $search = $this->getSearch($request);
+        $events = $this->getEvents($search);
+
+        $result = [];
+        foreach ($events as $event) {
+            $result[]   = [ 'id'    => $event->id,      'title' => $event->title, 'category' => $event->category,
+                            'start' => $event->start,   'end'   => $event->end  ];
+        }
+
+        return response()->json(['events'    => $result, 'categories' => Event::$categories]);
+    }
+
+
+
+    private function getSearch($request){
         $search = new \stdClass();
         $search->category   = (int)($request->category  ?? 0);
         $search->year       = (int)($request->year      ?? date('Y'));
         $search->month      = (int)($request->month     ?? date('n'));
 
+        return $search;
+    }
+
+    private function getEvents($search){
         $computeTime    = strtotime("{$search->year}-{$search->month}-05 00:00:00");
         $db = Event::where('end','>=',date('Y-m-01 00:00:00',$computeTime) );
         $db = $db->where(  'end','<=',date('Y-m-t 23:59:59' ,$computeTime) );
@@ -28,18 +65,7 @@ class CalendarController extends Controller
             return strtotime($event->start);
         });
 
-        $days   = [];
-        foreach ($events as $event) {
-            $days[] = date('j',strtotime($event->start));
-        }
-        $days   = array_unique($days);
-        sort($days);
-
-        return view('calendar.index',[
-            'events'    => $events,
-            'days'      => $days,
-            'search'    => $search,
-        ]);
+        return $events;
     }
 
 }
