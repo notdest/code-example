@@ -98,6 +98,15 @@ class UserController extends Controller
         ]);
     }
 
+    public function token(Request $request){
+        $user   = User::findOrFail((int) $request->id);
+
+        $user->tokens()->delete();
+        $token  = $user->createToken('main');
+
+        return $token->plainTextToken."\n";
+    }
+
     public function defaultPage(){
         if (Gate::allows('post-viewer')) {
             return redirect('posts');

@@ -122,4 +122,21 @@
 </div>
     @csrf
     <input type="submit" value="Сохранить" class="btn btn-success">
+    @if($user->role === \App\User::ROLE_ADMIN)
+        <script type="text/javascript">
+            function getToken(){
+                let text            = 'Я уверен, что нужно заново сгенерировать токен';
+                let confirmation    = prompt('Введите: "' + text +'"');
+                let location        = document.location;
+
+                if(confirmation === text){
+                    location.replace(location.protocol + "//" + location.host + "/users/token/{{ $user->id }}/" );
+                }
+            }
+        </script>
+
+        <button type="button" class="btn btn-warning" onclick="getToken();" id="tokenButton">
+            Заново сгенерировать токен
+        </button>
+    @endif
 </form>
