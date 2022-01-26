@@ -19,6 +19,24 @@ class TrendController extends Controller
         ]);
     }
 
+    public function apiIndex(Request $request){
+        $search = $this->getSearch($request);
+        $trends = $this->getTrends($search);
+
+        $results = [];
+        foreach ($trends as $trend) {
+            $result             = new \stdClass();
+            $result->id         = $trend->id;
+            $result->title      = $trend->title;
+            $result->traffic    = $trend->traffic;
+            $result->pubDate    = $trend->pubDate;
+            $result->news       = $trend->news;
+
+            $results[]          = $result;
+        }
+        return response()->json($results);
+    }
+
     public function download(Request $request){
         $search = $this->getSearch($request);
         $trends = $this->getTrends($search);
