@@ -19,5 +19,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/calendar/',      'CalendarController@apiIndex');
+    Route::get('/calendar/',        'CalendarController@apiIndex');
+    Route::get('/posts/',           'PostController@apiIndex');
+    Route::get('/stories/',         'StoryController@apiIndex');
+
+    Route::get('/persons/',         'PersonController@apiIndex');
+    Route::post('/persons/',        'PersonController@apiStore');
+    Route::get('/persons/{id}/',    'PersonController@apiView');
+    Route::post('/persons/{id}/',   'PersonController@apiSave');
+
+    Route::get('/sources/',         'SourceController@apiIndex');
+    Route::post('/sources/',        'SourceController@apiStore');
+    Route::get('/sources/{id}/',    'SourceController@apiView');
+    Route::post('/sources/{id}/',   'SourceController@apiSave');
 });
