@@ -19,6 +19,27 @@ class PersonController extends Controller
         ]);
     }
 
+    public function apiIndex(Request $request){
+        $name   = $request->name;
+        $db     = Person::orderBy('hidden')
+                        ->orderBy('id','desc');
+
+        if(strlen($name)>0){
+            $name   = str_replace(['"',"'","\\"],'',$name);
+            $db     = $db->where('name', 'like', "$name%");
+        }
+
+        $persons    = $db->paginate(100);
+        return response()->json([
+            'lastPage'  => $persons->lastPage(),
+            'persons'   => $persons->items(),
+        ]);
+    }
+
+    public function apiView(Request $request){
+        return response()->json(Person::findOrFail((int) $request->id));
+    }
+
 
     public function hide(Request $request){
         $id = (int) $request->id;
@@ -52,15 +73,7 @@ class PersonController extends Controller
     }
 
     public function save(Request $request){
-        $person     = Person::findOrFail((int) $request->id);
-
-        $fields     = $request->except('_token');
-        $person->fill($fields);
-
-        $validator  = \Validator::make($fields,[
-            'name'      => ['required',Rule::unique('persons')->ignore($person->id)],
-            'hidden'    => 'boolean',
-        ]);
+        [$person, $validator]   = $this->saveValidator($request);
 
         $success = false;
         if($validator->passes()){
@@ -74,6 +87,35 @@ class PersonController extends Controller
         ]);
     }
 
+    public function apiSave(Request $request){
+        [$person, $validator]   = $this->saveValidator($request);
+
+        $success = false;
+        if($validator->passes()){
+            $success = $person->save();
+        }
+
+        return response()->json([
+            'success'   => $success,
+            'person'    => $person,
+            'errors'    => $validator->errors(),
+        ]);
+    }
+
+    private function saveValidator($request){
+        $person     = Person::findOrFail((int) $request->id);
+
+        $fields     = $request->except('_token');
+        $person->fill($fields);
+
+        $validator  = \Validator::make($fields,[
+            'name'      => ['required',Rule::unique('persons')->ignore($person->id)],
+            'hidden'    => 'boolean',
+        ]);
+
+        return [$person, $validator];
+    }
+
     public function create(){
         return view('persons.create',[
             'person'    => new Person(),
@@ -81,15 +123,7 @@ class PersonController extends Controller
     }
 
     public function store(Request $request){
-        $person     = new Person();
-
-        $fields = $request->except('_token');
-        $person->fill($fields);
-
-        $validator  = \Validator::make($fields,[
-            'name'      => 'required|unique:App\Person,name',
-            'hidden'    => 'boolean',
-        ]);
+        [$person,$validator]    = $this->storeValidator($request);
 
         if($validator->passes()){
             $person->save();
@@ -100,5 +134,37 @@ class PersonController extends Controller
                 'errors'    => $validator->errors(),
             ]);
         }
+    }
+
+    public function apiStore(Request $request){
+        [$person,$validator]    = $this->storeValidator($request);
+
+        if($validator->passes()){
+            $person->save();
+            return response()->json([
+                'success'   => true,
+                'person'    => $person,
+            ]);
+        }else{
+            return response()->json([
+                'success'   => false,
+                'person'    => $person,
+                'errors'    => $validator->errors(),
+            ]);
+        }
+    }
+
+    private function storeValidator($request){
+        $person     = new Person();
+
+        $fields = $request->except('_token');
+        $person->fill($fields);
+
+        $validator  = \Validator::make($fields,[
+            'name'      => 'required|unique:App\Person,name',
+            'hidden'    => 'boolean',
+        ]);
+
+        return  [$person,$validator];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Source;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -19,6 +20,7 @@ class instagramApiPosts implements ShouldQueue
     protected $baseDir = '/var/www/public/';
     protected $cacheDir;
     protected $httpClient;
+    protected $headers;
     /**
      * Create a new job instance.
      *
@@ -40,7 +42,7 @@ class instagramApiPosts implements ShouldQueue
      */
     public function handle()
     {
-        $token  = env('RAPIDAPI_TOKEN');
+        $token      = env('RAPIDAPI_TOKEN');
         $startTime  = time();
 
         $config     = new \App\Configs\Instagram();
@@ -49,15 +51,18 @@ class instagramApiPosts implements ShouldQueue
             return;
         }
         $this->initImgCache();
-        $headers = [
+        $this->headers = [
             'x-rapidapi-host'   => "instagram39.p.rapidapi.com",
             'x-rapidapi-key'    => $token,
         ];
 
-        $allSources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active`>0 AND `userId` >0 ORDER BY `id` ;");
+        $allSources  = DB::select("SELECT * FROM `sources` WHERE `type`='instagram' AND `active`>0 ORDER BY `id` ;");
 
         $length = intval($config->feedMaxPages );                   // разбиваем источники на максимально равные куски в рамках предела
         $count  = ceil(count($allSources)/$length);
+        if($count <= 0){
+            return;
+        }
         $chunks = array_chunk($allSources, ceil(count($allSources)/$count)  );
 
         $minutes    = ( (date('j')*24)+date('G') )*60 + date('i');  // берем кусок в зависимости от минуты месяца
@@ -69,9 +74,14 @@ class instagramApiPosts implements ShouldQueue
                 sleep(($key*3)-$time);
             }
 
+            if($source->userId <= 0){       // проставляем userId вместо получения постов, чтобы уместится по времени
+                $this->takeUserId($source);
+                continue;
+            }
+
             $url    = "https://instagram39.p.rapidapi.com/getFeed?user_id={$source->userId}";
 
-            $response   = $this->httpClient->request('GET', $url, ['headers' => $headers])->getBody();;
+            $response   = $this->httpClient->request('GET', $url, ['headers' => $this->headers])->getBody();;
             $data       = json_decode($response);
 
             $ids        = array_map( function ($v){return intval($v->node->id);}, $data->data->edges);
@@ -119,5 +129,20 @@ class instagramApiPosts implements ShouldQueue
             $this->httpClient->request('GET', $imgUrl, ['sink' => $this->baseDir.$localImg]);
         }
         return '/'.$localImg;
+    }
+
+    // метод получает численный userId, и либо записывает его источнику, либо деактивирует источник при ошибке
+    protected function takeUserId($source){
+        $url        = "https://instagram39.p.rapidapi.com/getUserId?username={$source->code}";
+        $response   = $this->httpClient->request('GET', $url, ['headers' => $this->headers])->getBody();;
+        $data       = json_decode($response);
+
+        $obj    = Source::find($source->id);
+        if($data->success === true){
+            $obj->userId    = $data->data->id;
+        }else{
+            $obj->active    = 0;
+        }
+        $obj->save();
     }
 }

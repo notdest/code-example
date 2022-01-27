@@ -67,9 +67,10 @@ class InstagramController extends Controller
     }
 
     /*
+        Метод устарел, сейчас простановка идет при скачивании постов
+
         Этот метод доступен только по URL (/instagram/fill-users-id/), интерфейс не делал
-        Проставляет численные id пользователей инсты. В идеале потом встроить в редактирование пользователей
-        и перевести на платные API вместо использования нашего пользователя */
+        Проставляет численные id пользователей инсты.*/
     public function fillUsersId(){
         $config     = new \App\Configs\Instagram();
         $instagram  = $config->getClient();
