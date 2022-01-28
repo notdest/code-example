@@ -34,4 +34,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/sources/{id}/',   'SourceController@apiSave');
 
     Route::get('/trends/',          'TrendController@apiIndex');
+
+    Route::get('/articles/',                'ArticleController@apiIndex');
+    Route::get('/articles/text/{id}/',      'ArticleController@apiText');
+    Route::get('/articles/translate/{id}/', 'ArticleController@translate');
 });
