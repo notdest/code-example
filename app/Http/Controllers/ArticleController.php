@@ -8,11 +8,10 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use PhpOffice\PhpSpreadsheet\{IOFactory,Spreadsheet};
 use Illuminate\Support\Facades\DB;
-use function GuzzleHttp\Psr7\str;
 
 class ArticleController extends Controller
 {
-    //
+
     public function index(Request $request){
         $search   = $this->getSearch($request);
         $articles = $this->getArticles($search,500);
@@ -23,11 +22,53 @@ class ArticleController extends Controller
         ]);
     }
 
+    public function apiIndex(Request $request){
+        $search     = $this->getSearch($request);
+        $paginator  = $this->getArticles($search,500);
+
+        $items      = $paginator->items();
+        $articles   = [];
+        foreach ($items as $item) {
+            $article                        = new \stdClass();
+            $article->id                    = $item->id;
+            $article->title                 = $item->title;
+            $article->foreign_title         = $item->foreign_title;
+            $article->link                  = $item->link;
+            $article->pub_date              = $item->pub_date;
+            $article->categories            = $item->categories;
+            $article->unknown_categories    = $item->unknown_categories;
+            $article->haveText              = intval(strlen($item->original_text) > 0);
+            $article->source                = [     'id'        => $item->source->id,
+                                                    'name'      => $item->source->name,
+                                                    'link'      => $item->source->link,
+                                                    'stream'    => $item->source->stream,
+                                                    'foreign'   => $item->source->foreign ];
+
+            $articles[]  = $article;
+        }
+
+        return response()->json([
+            'lastPage'      => $paginator->lastPage(),
+            'articles'      => $articles,
+            'streams'       => [ '0' =>'Все потоки'] + \App\RssSource::$streams,
+            'categories'    => [ 0 => ' Все категории '] + \App\Article::$categories
+        ]);
+    }
+
 
     public function text(Request $request){
         return view('articles.text',[
             'article'   => \App\Article::findOrFail((int) $request->id),
         ]);
+    }
+
+    public function apiText(Request $request){
+        $article    = \App\Article::findOrFail((int) $request->id);
+
+        unset($article['source_id'],$article['categories'],$article['unknown_categories']);
+        unset($article['external_id'],$article['translate']);
+
+        return response()->json($article);
     }
 
 
