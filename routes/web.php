@@ -82,7 +82,11 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/regular-events/save/',        'RegularEventController@save');
 });
 
-Route::get('/',                         'UserController@defaultPage')->middleware('auth');
+Route::middleware('auth')->group(function () {
+    Route::get('/liveinternet/',                'LiveinternetController@index');
+    Route::get('/',                             'UserController@defaultPage');
+});
+
 Route::get('/trends/',                  'TrendController@index');
 Route::get('/trends/download/',         'TrendController@download');
 
