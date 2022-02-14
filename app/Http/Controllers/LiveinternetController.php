@@ -10,7 +10,7 @@ class LiveinternetController extends Controller
     public function index(Request $request){
         $tab    = $request->tab     ?? 'zen';
         $day    = $request->date    ?? '-1 day';
-        if(!in_array($tab,['zen','social','yandex'])){
+        if(!in_array($tab,['zen','social','yandex','ru', 's_googl', 'n_y', 'n_g', 'android_google'])){
             $tab    = 'zen';
         }
 
