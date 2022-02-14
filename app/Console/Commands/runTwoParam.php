@@ -11,7 +11,7 @@ class runTwoParam extends Command
      *
      * @var string
      */
-    protected $signature = 'run:twoParam {job=0} {first=-1} {second=-1} {--t|time}';
+    protected $signature = 'run:twoParam {job=0} {first?} {second?} {--t|time}';
 
     /**
      * The console command description.
@@ -41,7 +41,7 @@ class runTwoParam extends Command
         $first  = $this->argument('first');
         $second = $this->argument('second');
 
-        if($job && ($first > -1) && ($second > -1)){
+        if($job && !is_null($first) && !is_null($second)){
             $time   = $this->option('time');
             if($time){
                 echo date("Y-m-d H:i:s\n");

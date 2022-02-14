@@ -17,15 +17,17 @@ class parseLiveinternet implements ShouldQueue
 
     protected $date;
     protected $nextDate;
+    protected $append;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct( $input ){
+    public function __construct( $input, $append = false ){
         $time           = strtotime($input);
         $this->date     = date('Y-m-d',$time);
         $this->nextDate = date('Y-m-d',strtotime('+1 day',$time));
+        $this->append   = (bool) $append;
     }
 
 
@@ -40,20 +42,32 @@ class parseLiveinternet implements ShouldQueue
      */
     public function handle(){
         $sources    = [
-            'zen'    => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=zen',
-            'social' => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=social',
-            'yandex' => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=s_yandex',
+            'zen'               => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=zen',
+            'social'            => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=social',
+            'yandex'            => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=s_yandex',
+            'ru'                => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=ru',
+            's_googl'           => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=s_googl',
+            'n_y'               => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=n_y',
+            'n_g'               => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=n_g',
+            'android_google'    => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=android-google',
         ];
 
-        $count  =  DB::table('liveinternet')->where('day', $this->date)->count();
-        if($count > 0){
-            throw new \Exception('already processed this date');
+        if($this->append){
+            $collected  = DB::table('liveinternet')->select('type')->distinct()->where('day', $this->date)
+                                                                               ->get()->keyBy('type')->all();
+        }else{
+            $count  =  DB::table('liveinternet')->where('day', $this->date)->count();
+            if($count > 0){
+                throw new \Exception('already processed this date');
+            }
         }
 
         $httpClient = new \GuzzleHttp\Client();
         $jar        = \GuzzleHttp\Cookie\CookieJar::fromArray(['per_page' => '100'], 'www.liveinternet.ru');
 
         foreach ($sources as $type => $link) {
+            if(isset($collected[$type])) continue;
+
             sleep(1);
             $response   = $httpClient->request('GET', $link.'&date='.$this->date, ['cookies' => $jar]);
             $html       = $response->getBody()->getContents();

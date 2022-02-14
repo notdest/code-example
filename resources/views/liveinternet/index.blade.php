@@ -18,6 +18,21 @@
         <li class="nav-item">
             <a class="nav-link {{ ($tab === 'social') ? 'active': '' }}" href="/liveinternet/?tab=social">Переходы из соцсетей</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'ru') ? 'active': '' }}" href="/liveinternet/?tab=ru">Общие данные</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 's_googl') ? 'active': '' }}" href="/liveinternet/?tab=s_googl">Переходы из поиска Гугла</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'n_y') ? 'active': '' }}" href="/liveinternet/?tab=n_y">Яндекс новости</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'n_g') ? 'active': '' }}" href="/liveinternet/?tab=n_g">Google News</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'android_google') ? 'active': '' }}" href="/liveinternet/?tab=android_google">Гугл Дискавер</a>
+        </li>
     </ul>
 
     <h3>Динамика дня</h3>
