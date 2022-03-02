@@ -84,6 +84,7 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/liveinternet/',                'LiveinternetController@index');
+    Route::get('/liveinternet/download/',       'LiveinternetController@download');
     Route::get('/',                             'UserController@defaultPage');
 });
 
