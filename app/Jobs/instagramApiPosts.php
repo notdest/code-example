@@ -17,6 +17,7 @@ class instagramApiPosts implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $tries = 1;
+    public $maxExceptions = 1;
 
     protected $baseDir = '/var/www/public/';
     protected $cacheDir;

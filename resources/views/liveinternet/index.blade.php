@@ -5,6 +5,7 @@
     @php
         $globalFormatter    = Date::createFromTimestamp($date);
         $formatter          = clone $globalFormatter;
+        $params             = 'tab='.$tab.'&date='.date('Y-m-d',$date);
     @endphp
     <h2>LiveInternet</h2>
 
@@ -35,7 +36,10 @@
         </li>
     </ul>
 
-    <h3>Динамика дня</h3>
+    <div class="clearfix mb-3 mt-5"  style="max-width: 70em;">
+        <span class="h3">Динамика дня</span>
+        <a href="/liveinternet/download/?{!!$params !!}&table=day"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
+    </div>
 
     <div class="table-responsive">
         <table class="table table-striped table-sm" style="max-width: 70em;">
@@ -65,7 +69,10 @@
         </table>
     </div>
 
-    <h3 class="mt-3">Сумма за неделю</h3>
+    <div class="clearfix mb-3 mt-5"  style="max-width: 70em;">
+        <span class="h3">Сумма за неделю</span>
+        <a href="/liveinternet/download/?{!!$params !!}&table=week"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
+    </div>
     @php
         $formatter      = clone $globalFormatter;
         $period         = $lastWeek->max('count');
@@ -108,7 +115,10 @@
     </div>
     <p>Собрано дней: {{ $period }}</p>
 
-    <h3 class="mt-4">Сумма за месяц</h3>
+    <div class="clearfix mb-3 mt-5"  style="max-width: 70em;">
+        <span class="h3">Сумма за месяц</span>
+        <a href="/liveinternet/download/?{!!$params !!}&table=month"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
+    </div>
     @php
         $formatter      = clone $globalFormatter;
         $period         = $lastMonth->max('count');
@@ -150,6 +160,55 @@
         </table>
     </div>
     <p>Собрано дней: {{ $period }}</p>
+
+
+    <div class="clearfix mb-3 mt-5"  style="max-width: 70em;">
+        <span class="h3">Сумма за календарный месяц</span>
+        <a href="/liveinternet/download/?{!!$params !!}&table=calendar_month"><img src="/img/xlsx.png" style="height: 45px;" class="float-right"></a>
+    </div>
+    @php
+        $formatter      = Date::now();
+        $period         = $lastCalendarMonth->max('count');
+        $previousPeriod = $previousCalendarMonth->max('count');
+        $previousCalendarMonth  = $previousCalendarMonth->keyBy('site');
+    @endphp
+    <div class="table-responsive">
+        <table class="table table-striped table-sm" style="max-width: 70em;">
+            <thead class="thead-dark">
+            <tr>
+                <th>Сайт</th>
+                <th style="text-align: center;">
+                    {{ $formatter->subMonth()->day(1)->format('j F'). " - " .$formatter->format('t F')}}
+                </th>
+                <th style="text-align: center;">
+                    {{ $formatter->subMonth()->format('j F')." - " .$formatter->format('t F')}}
+                </th>
+                <th style="text-align: center;">Динамика (%)</th>
+            </tr>
+            </thead>
+            @foreach($lastCalendarMonth as $row)
+                @if(isset($previousCalendarMonth[$row->site]))
+                    <tr>
+                        <td>{{$row->site}}</td>
+                        <td style="text-align: center;">{{ number_format($row->views,0,'.',' ')}}</td>
+                        <td style="text-align: center;">{{ number_format($previousCalendarMonth[$row->site]->views,0,'.',' ') }}</td>
+                        <td style="text-align: center;">
+                            @if( ($row->count === $period) && ($previousCalendarMonth[$row->site]->count === $previousPeriod) )
+                                {{ number_format(( ($row->views - $previousCalendarMonth[$row->site]->views)/$previousCalendarMonth[$row->site]->views)*100,2,'.',' ') }}
+                            @else
+                                {{$row->count ."дн. - ".$previousCalendarMonth[$row->site]->count."дн."}}
+                            @endif
+                        </td>
+                    </tr>
+                @endif
+            @endforeach
+            <tbody>
+
+            </tbody>
+        </table>
+    </div>
+    <p>Собрано дней за {{ $formatter->addMonth()->format('F') }}: {{ $period }};
+    за {{ $formatter->subMonth()->format('F') }}: {{ $previousPeriod }}</p>
     <br><br><br><br><br>
 
 @endsection
