@@ -27,13 +27,13 @@ class LiveinternetController extends Controller
         $previousWeek   = $this->getPeriod($tab, strtotime('-13 day',$date), strtotime('-7 day',$date), $sites);
 
         $lastMonth      = $this->getPeriod($tab, strtotime('-29 day',$date), $date);
-        $sites          = $lastWeek->pluck('site');
+        $sites          = $lastMonth->pluck('site');
         $previousMonth  = $this->getPeriod($tab, strtotime('-59 day',$date), strtotime('-30 day',$date), $sites);
 
 
         $lastCalendarMonth      = $this->getPeriod($tab,    strtotime('first day of previous month'),
                                                             strtotime('last day of previous month'));
-        $sites                  = $lastWeek->pluck('site');
+        $sites                  = $lastCalendarMonth->pluck('site');
         $previousCalendarMonth  = $this->getPeriod($tab,    strtotime('first day of -2 month'),
                                                             strtotime('last day of -2 month'), $sites);
 
