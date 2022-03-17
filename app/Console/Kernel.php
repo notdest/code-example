@@ -32,7 +32,9 @@ class Kernel extends ConsoleKernel
 
         $schedule->command("run:void parseEvents")         ->dailyAt('4:07');
         $schedule->command("Instagram:clearCache  1")      ->monthlyOn(2, '4:21');
-        $schedule->command("run:oneParam parseLiveinternet yesterday")  ->dailyAt('4:09');
+
+        $schedule->command("run:oneParam parseLiveinternet yesterday")      ->dailyAt('4:09');
+        $schedule->command("run:oneParam parseLiveinternetPages yesterday") ->dailyAt('4:26');
     }
 
     /**
