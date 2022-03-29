@@ -38,6 +38,7 @@ Route::middleware(['auth', 'can:post-editor'])->group(function () {
 
 Route::middleware(['auth', 'can:article-viewer'])->group(function () {
     Route::get('/articles/',                'ArticleController@index');
+    Route::get('/articles/buckingham/',     'ArticleController@buckingham');
     Route::get('/articles/download/',       'ArticleController@download');
     Route::get('/articles/text/{id}/',      'ArticleController@text');
     Route::get('/articles/translate/{id}/', 'ArticleController@translate');
