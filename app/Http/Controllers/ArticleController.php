@@ -55,6 +55,22 @@ class ArticleController extends Controller
         ]);
     }
 
+    public function buckingham(Request $request){
+        $search   = $this->getSearch($request,strtotime('-2 day'));
+
+        $search->foreign    = 2;
+        $search->stream     = \App\RssSource::STREAM_BUCKINGHAM;
+        $search->searchQuery    = 'Букингем | Букингемский | Елизавета | Меган | Миддлтон | Уильям | Маркл | принц |'.
+            ' принцесса | королева | Чарльз | Камилла | Виндзор | Виндзорский | Виндзоры | Королевский | Королевская |'.
+            ' Королевские | Королевскую | Королевского | Королевских | Король | Королева | Филипп | монарх | монархический | Диана | Гарри';
+
+        $articles = $this->getArticles($search,500);
+
+        return view('articles.buckingham',[
+            'search'    => $search,
+            'articles'  => $articles,
+        ]);
+    }
 
     public function text(Request $request){
         return view('articles.text',[
@@ -280,12 +296,12 @@ class ArticleController extends Controller
         return $articles;
     }
 
-    private function getSearch($request){
+    private function getSearch($request, $from = null){
         $search             = new \stdClass();
         $search->stream     = (int) ($request->stream       ?? 0);
         $search->source     = (int) ($request->source       ?? 0);
         $search->category   = (int) ($request->category     ?? 0);
-        $search->from       = $request->from                ?? date('Y-m-d 00:00:00');
+        $search->from       = $request->from                ?? date('Y-m-d 00:00:00', $from ? $from : time());
         $search->to         = $request->to                  ?? date('Y-m-d 23:59:59');
         $search->translate  = (int) ($request->translate    ?? 1); // влияет только на отображение
         $search->foreign    = (int) ($request->foreign      ?? 0);

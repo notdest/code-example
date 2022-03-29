@@ -19,7 +19,8 @@ class RssSource extends Model
     const STREAM_ESQUIRE    = 8;
     const STREAM_GRAZIA     = 16;
     const STREAM_BAZAAR     = 32;
-    //const STREAM_ROBB       = 64;
+    const STREAM_BUCKINGHAM = 64;
+    //const STREAM_ROBB       = 128;
 
     public static $streams  = [
         self::STREAM_COSMO      => "Cosmopolitan",
@@ -28,6 +29,7 @@ class RssSource extends Model
         self::STREAM_ESQUIRE    => "Esquire",
         self::STREAM_GRAZIA     => "GRAZIA",
         self::STREAM_BAZAAR     => "Harper's Bazaar",
+        self::STREAM_BUCKINGHAM => "Букингем",
        // self::STREAM_ROBB       => "Robb Report",
     ];
 
