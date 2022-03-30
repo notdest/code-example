@@ -30,7 +30,7 @@ env:
   DB_USERNAME: "parser"
   DB_PASSWORD: "LF8ikAmgaqQJyzdj"
 
-  SPHINX_HOST: "gc-sphinx.fppressa.ru" # gc-cosmo-dev
+  SPHINX_HOST: "yc-sphinx.fppressa.ru" # gc-cosmo-dev
   SPHINX_PORT: "9306"
 
   BROADCAST_DRIVER: "log"
