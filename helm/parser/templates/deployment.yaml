@@ -36,6 +36,10 @@ spec:
                 name: {{ include "parser.fullname" . }}
             - secretRef:
                 name: {{ include "parser.fullname" . }}-secret
+            {{- range .Values.secretRefs }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
           volumeMounts:
             - name: google-translate-key
               mountPath: "/var/www/config/google-translate-credentials.json"
@@ -44,7 +48,8 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["gcsfuse", "-o", "allow_other", "{{ .Values.env.IMAGE_BUCKET }}", "/var/www/public/img_cache"]
+                #command: ["gcsfuse", "-o", "allow_other", "{{ .Values.env.IMAGE_BUCKET }}", "/var/www/public/img_cache"]
+                command: ["goofys", "--endpoint", "https://storage.yandexcloud.net" ,"{{ .Values.env.IMAGE_BUCKET }}", "/var/www/public/img_cache"]
             preStop:
               exec:
                 command: ["fusermount", "-u", "/var/www/public/img_cache"]

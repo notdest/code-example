@@ -30,10 +30,11 @@ RUN  set -xe \
 
 RUN chmod -R a+rw /app
 
-FROM eu.gcr.io/feshn-press-llc/nginx-fpm:1.17.9-7.4-1
+FROM cr.yandex/crp5d1c4jf7lem7cn9aq/nginx-fpm:1.17.9-7.4-3
 
 RUN apk add --no-cache ca-certificates fuse && rm -rf /tmp/*
-COPY docker/bin/gcsfuse /usr/local/bin
+#COPY docker/bin/gcsfuse /usr/local/bin
+COPY docker/bin/goofys /usr/local/bin
 
 # Set working directory
 WORKDIR /var/www
