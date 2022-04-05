@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Google\Cloud\Translate\V3\TranslationServiceClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -53,36 +52,16 @@ class ArticleRewriteController extends Controller
             ];
         }
 
-        $translationClient = new TranslationServiceClient([
-            'credentials' => config_path('google-translate-credentials.json'),
-        ]);
-        $parent = TranslationServiceClient::locationName(app('config')['common.translate.projectId'], 'global');
-
         if(!strlen($article->title) && strlen(trim($article->foreign_title))){
-            $translations   = $translationClient->translateText([$article->foreign_title], 'ru', $parent)->getTranslations();
-            $article->title = $translations[0]->getTranslatedText();
+            $article->title     = \YandexTranslate::single($article->foreign_title);
             $article->save();
         }
 
         if(!strlen($article->translated_text) && strlen(trim($article->original_text))){
-            $strings    = explode("\n",$article->original_text);            // режет переносы строки, приходится самому воспроизводить
-            $filtered   = array_filter($strings,function ($v){ return strlen(trim($v))>0 ;});
-            $translations   = $translationClient->translateText($filtered, 'ru', $parent)->getTranslations();
-
-            $i  = 0;
-            foreach ($strings as $string) {
-                if(strlen(trim($string))>0){
-                    $article->translated_text .= $translations[$i]->getTranslatedText()."\n";
-                    $i++;
-                }else{
-                    $article->translated_text .= $string."\n";
-                }
-            }
+            $article->translated_text = \YandexTranslate::large($article->original_text);
             $article->save();
         }
 
-
-        $translationClient->close();
         return [
             'success'           => true,
             'translatedTitle'   => $article->title,
@@ -93,11 +72,6 @@ class ArticleRewriteController extends Controller
 
     public function translateTitles(){
         $limit  = 50;
-        $translationClient = new TranslationServiceClient([
-            'credentials' => config_path('google-translate-credentials.json'),
-        ]);
-        $parent = TranslationServiceClient::locationName(app('config')['common.translate.projectId'], 'global');
-
 
         do {
             $articles = \App\ArticleRewrite::where('title', '')->take($limit)->get();
@@ -107,7 +81,7 @@ class ArticleRewriteController extends Controller
                     $contents[] = $article->foreign_title;
                 }
 
-                $translations = $translationClient->translateText($contents, 'ru', $parent)->getTranslations();
+                $translations = \YandexTranslate::batch($contents) ;
 
                 if (count($translations) !== count($articles)) {
                     throw new \RuntimeException("the number of translations does not match the number of articles");
@@ -115,13 +89,12 @@ class ArticleRewriteController extends Controller
 
                 foreach ($translations as $k => $translation) {
                     $article = $articles[$k];   // я не нашел способа однозначно связать перевод с оригиналом
-                    $article->title = html_entity_decode($translation->getTranslatedText(),ENT_QUOTES);
+                    $article->title = $translation;
                     $article->save();
                 }
             }
         }while(count($articles)>= $limit);
 
-        $translationClient->close();
         return back();
     }
 
