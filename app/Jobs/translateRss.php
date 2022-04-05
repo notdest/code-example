@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use Google\Cloud\Translate\V3\TranslationServiceClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -30,11 +29,6 @@ class translateRss implements ShouldQueue
      */
     public function handle(){
         $limit  = 50;
-        $translationClient = new TranslationServiceClient([
-            'credentials' => config_path('google-translate-credentials.json'),
-        ]);
-        $parent = TranslationServiceClient::locationName(app('config')['common.translate.projectId'], 'global');
-
 
         do {
             $articles = \App\Article::where('translate', '>', 0)->take($limit)->get();
@@ -44,7 +38,7 @@ class translateRss implements ShouldQueue
                     $contents[] = $article->foreign_title;
                 }
 
-                $translations = $translationClient->translateText($contents, 'ru', $parent)->getTranslations();
+                $translations = \YandexTranslate::batch($contents) ;
 
                 if (count($translations) !== count($articles)) {
                     throw new \RuntimeException("the number of translations does not match the number of articles");
@@ -53,12 +47,10 @@ class translateRss implements ShouldQueue
                 foreach ($translations as $k => $translation) {
                     $article = $articles[$k];   // я не нашел способа однозначно связать перевод с оригиналом
                     $article->translate = 0;
-                    $article->title = html_entity_decode($translation->getTranslatedText(),ENT_QUOTES);
+                    $article->title = $translation;
                     $article->save();
                 }
             }
         }while(count($articles)>= $limit);
-
-        $translationClient->close();
     }
 }
