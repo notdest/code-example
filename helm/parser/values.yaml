@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: eu.gcr.io/feshn-press-llc/parser
+  repository: cr.yandex/crp5d1c4jf7lem7cn9aq/parser
   pullPolicy: Always
 
 imagePullSecrets: []
@@ -24,7 +24,7 @@ env:
   LOG_CHANNEL: "stderr"
 
   DB_CONNECTION: "mysql"
-  DB_HOST: "10.167.136.20" # gc-mysql2
+  DB_HOST: 'c-c9qq4krrjbkeggplvjch.rw.mdb.yandexcloud.net' # yc-db-prod Master
   DB_PORT: "3306"
   DB_DATABASE: "parser"
   DB_USERNAME: "parser"
@@ -53,15 +53,21 @@ env:
 
   IMAGE_BUCKET: im-parser
 
-secrets: &secrets
+secrets:
   externalSecret: true
-  key: parser-secrets
-  version: 1
+  secretStoreName: lockbox
+  key: e6qhtbcnu8mm53kqqk1c # parser-secrets
+  version: null
+
 
 googleTranslateKey:
   externalSecret: true
-  key: parser-google-translate
-  version: 1
+  secretStoreName: lockbox
+  key: e6qvtutmbchh7l5pfnfg # parser-google-translate
+  version: null
+
+secretRefs:
+  - yc-keys
 
 db:
   migrations: true
@@ -77,12 +83,12 @@ scheduler:
 
 serviceAccount:
   # Specifies whether a service account should be created
-  create: false
+  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: parser-sa
+  name:
 
 podSecurityContext: {}
   # fsGroup: 2000

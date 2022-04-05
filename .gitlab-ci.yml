@@ -11,9 +11,10 @@ build:
     - docker:stable-dind
   stage: build
   script:
-    - echo "${GCR_KEY}" | docker login -u _json_key --password-stdin https://eu.gcr.io
-    - docker build -t ${DOCKER_REGISTRY}/parser:${VERSION} -f docker/Dockerfile .
-    - docker push ${DOCKER_REGISTRY}/parser:${VERSION}
+    #- echo "${GCR_KEY}" | docker login -u _json_key --password-stdin https://eu.gcr.io
+    - cat ${YC_GITLAB_KEY} | docker login --username json_key --password-stdin cr.yandex
+    - docker build -t ${YC_REGISTRY}/parser:${VERSION} -f docker/Dockerfile .
+    - docker push ${YC_REGISTRY}/parser:${VERSION}
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
       when: always
@@ -42,6 +43,34 @@ Deploy to gke:
     - build
   environment:
     name: master
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
+      when: on_success
+    - if: $CI_COMMIT_REF_NAME =~ /^.+$/
+      when: manual
+      allow_failure: true
+    - when: never
+      allow_failure: true
+  tags:
+    - default
+
+Deploy to YC:
+  image: cr.yandex/crp5d1c4jf7lem7cn9aq/yc-kubectl-helm:0.1.0
+  stage: deploy
+  before_script:
+    - ~/yandex-cloud/bin/yc config set service-account-key ${YC_GITLAB_KEY}
+    - ~/yandex-cloud/bin/yc config set cloud-id ${YC_CLOUD_ID}
+    - ~/yandex-cloud/bin/yc config set folder-id ${YC_FOLDER_ID}
+    - ~/yandex-cloud/bin/yc managed-kubernetes cluster get-credentials --id ${YC_CLUSTER_ID} --external
+  script:
+    - cd ./helm/parser
+    - 'sed -i "/appVersion:/c\appVersion: ${VERSION}" Chart.yaml'
+    - helm dependency update
+    - helm upgrade --install -n parser-prod parser .
+  dependencies:
+    - build
+  environment:
+    name: prod
   rules:
     - if: $CI_COMMIT_REF_NAME == "master"
       when: on_success
