@@ -16,6 +16,7 @@ RUN  set -xe \
     --no-scripts \
     --prefer-dist \
     --no-dev \
+    && composer dump-autoload \
     && npm install \
     && find ./vendor -mindepth 2 -type d -name .git | xargs rm -rf
 
@@ -25,6 +26,7 @@ RUN  set -xe \
      #&& ./artisan horizon:install \
      #&& ./artisan apidoc:generate \
      #&& ./artisan passport:keys \
+     && composer dump-autoload \
      && npm install \
      && find ./vendor -mindepth 2 -type d -name .git | xargs rm -rf
 
