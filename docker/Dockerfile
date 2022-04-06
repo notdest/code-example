@@ -1,4 +1,4 @@
-FROM composer:2.0 as builder
+FROM composer:2 as builder
 
 RUN apk add --no-cache nodejs npm \
     && npm install --global gulp
