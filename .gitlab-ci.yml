@@ -26,34 +26,6 @@ build:
   tags:
     - default
 
-Deploy to gke:
-  image: eu.gcr.io/feshn-press-llc/gcloud-kubectl-helm:0.2.0
-  stage: deploy
-  before_script:
-    - echo "$GKE_KEY" > gke_key.json
-    - gcloud auth activate-service-account --key-file=gke_key.json
-    - gcloud config set project $GCP_PROJECT
-    - gcloud container clusters get-credentials $GKE_CLUSTER --region $GCP_REGION --project $GCP_PROJECT
-  script:
-    - cd ./helm/parser
-    - 'sed -i "/appVersion:/c\appVersion: ${VERSION}" Chart.yaml'
-    - helm dependency update
-    - helm upgrade --install -n parser parser .
-  dependencies:
-    - build
-  environment:
-    name: master
-  rules:
-    - if: $CI_COMMIT_REF_NAME == "master"
-      when: on_success
-    - if: $CI_COMMIT_REF_NAME =~ /^.+$/
-      when: manual
-      allow_failure: true
-    - when: never
-      allow_failure: true
-  tags:
-    - default
-
 Deploy to YC:
   image: cr.yandex/crp5d1c4jf7lem7cn9aq/yc-kubectl-helm:0.1.0
   stage: deploy
