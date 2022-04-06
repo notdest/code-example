@@ -3,23 +3,27 @@ FROM composer:2 as builder
 RUN apk add --no-cache nodejs npm \
     && npm install --global gulp
 
-COPY database/ database/
-COPY composer.json composer.json
-COPY composer.lock composer.lock
-COPY package.json package.json
-COPY library/ library/
-
-RUN  set -xe \
-     && composer install \
-    --ignore-platform-reqs \
-    --no-interaction \
-    --no-plugins \
-    --no-scripts \
-    --prefer-dist \
-    --no-dev \
-    && composer dump-autoload \
-    && npm install \
-    && find ./vendor -mindepth 2 -type d -name .git | xargs rm -rf
+#COPY database/ database/
+#COPY composer.json composer.json
+#COPY composer.lock composer.lock
+#COPY package.json package.json
+#COPY bootstrap/ bootstrap/
+#COPY library/ library/
+#COPY artisan artisan
+#
+#RUN  set -xe \
+#     && composer install \
+#    --ignore-platform-reqs \
+#    --no-interaction \
+#    --no-plugins \
+#    --no-scripts \
+#    --no-autoloader \
+#    --classmap-authoritative \
+#    --prefer-dist \
+#    --no-dev \
+#    && composer dump-autoload \
+#    && npm install \
+#    && find ./vendor -mindepth 2 -type d -name .git | xargs rm -rf
 
 COPY . .
 RUN  set -xe \
