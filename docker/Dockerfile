@@ -7,6 +7,7 @@ COPY database/ database/
 COPY composer.json composer.json
 COPY composer.lock composer.lock
 COPY package.json package.json
+COPY library/ library/
 
 RUN  set -xe \
      && composer install \
