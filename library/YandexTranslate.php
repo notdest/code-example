@@ -9,7 +9,7 @@ class YandexTranslate {
 
     // Берет на вход массив с текстами, на выходе точно такой же массив с переводами
     public static function batch($batch){
-        $key        = env('YANDEX_CLOUD_KEY');
+        $key        = env('IMEDIA_YANDEX_CLOUD_KEY');
 
         $client     = new \GuzzleHttp\Client(['base_uri' => 'https://translate.api.cloud.yandex.net']);
 
