@@ -40,7 +40,12 @@ class ExternalRssImport extends Command
             $adapter    = new  $class();
 
             try {
-                $response   = $httpClient->request('GET', $source->link);
+                $response   = $httpClient->request('GET', $source->link,[
+                    'headers' => [
+                        'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.60 Safari/537.36',
+                    ]
+                ]);
+
                 $plainXml   = $adapter->filter($response->getBody()->getContents());
                 $xml        = simplexml_load_string($plainXml, "SimpleXMLElement", LIBXML_NOCDATA);
             } catch (\Throwable $e) {
