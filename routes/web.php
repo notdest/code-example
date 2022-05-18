@@ -81,6 +81,10 @@ Route::middleware(['auth', 'can:admin'])->group(function () {
     Route::post('/regular-events/tsv/',         'RegularEventController@tsv');
     Route::get( '/regular-events/delete/{id}/', 'RegularEventController@delete');
     Route::post('/regular-events/save/',        'RegularEventController@save');
+
+    Route::get('/calendar/month/',              'CalendarController@index');
+    Route::get('/calendar/add/{id}/{regular}/', 'CalendarController@addWeekEvent');
+    Route::get('/calendar/delete/{id}/',        'CalendarController@deleteWeekEvent');
 });
 
 Route::middleware('auth')->group(function () {
@@ -91,11 +95,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/liveinternet-pages/download/', 'LiveinternetPagesController@download');
 
     Route::get('/',                             'UserController@defaultPage');
+
+    Route::get('/calendar/',                    'CalendarController@week');
 });
 
 Route::get('/trends/',                  'TrendController@index');
 Route::get('/trends/download/',         'TrendController@download');
 
-Route::get('/calendar/',                'CalendarController@index');
 
 Auth::routes(['register' => false,'reset' => false]);
