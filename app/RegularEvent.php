@@ -8,6 +8,8 @@ class RegularEvent extends Model
 {
     private $year   = 0;
 
+    public $regular     = true;
+    public $weekEvent   = 0;
     /*
         !!!!!!!!!!! год приводим к 2020 в БД !!!!!!!!!!
 

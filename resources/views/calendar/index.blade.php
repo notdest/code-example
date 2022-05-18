@@ -6,6 +6,7 @@
 
     $start      = '';
     $today      = date('Y-m-d');
+    $weekDays   = ['пн.','вт.','ср.','чт.','пт.','сб.','вс.'];
 @endphp
 
 @section('body-params') data-spy="scroll" data-target="#spy-navbar" data-offset="300" @endsection
@@ -46,10 +47,10 @@
 
         $prevMonth      = $months[$search->month-1].' '.( ($search->month < 2) ? $search->year - 1 : $search->year);
         $nextMonth      = $months[$search->month+1].' '.( ($search->month > 11) ? $search->year + 1 : $search->year);
-        $prevLink       = "/calendar/?category={$search->category}&year=".
+        $prevLink       = "/calendar/month/?category={$search->category}&year=".
                                 (($search->month < 2) ? $search->year - 1 : $search->year)."&month=".
                                 (($search->month < 2) ? 12 : $search->month - 1 );
-        $nextLink       = "/calendar/?category={$search->category}&year=".
+        $nextLink       = "/calendar/month/?category={$search->category}&year=".
                                 (($search->month > 11) ? $search->year + 1 : $search->year)."&month=".
                                 (($search->month > 11) ? 1 : $search->month + 1 );
     @endphp
@@ -63,6 +64,24 @@
                 window.scrollTo(0,   Math.round( $("#day_{{$currentDay}}").position().top ) - 200   );
             })
         @endif
+
+        function addEvent(id,regular){
+            $.get( "/calendar/add/"+id+"/"+regular.toString()+'/', function( data ) {
+                let jsID = id + (regular ? 'r':'');
+                $('#addLink_'+jsID).hide();
+                $('#delLink_'+jsID).show().data('id', data.id);
+            });
+        }
+
+        function deleteEvent(id,regular){
+            let jsID    = id + (regular ? 'r':'');
+            let eventId = $('#delLink_'+jsID).data('id');
+
+            $.get( "/calendar/delete/"+eventId+"/", function() {
+                $('#addLink_'+jsID).show();
+                $('#delLink_'+jsID).hide().data('id', 0);
+            });
+        }
     </script>
 
     <h2>Календарь событий {{ $currentMonth }}</h2>
@@ -90,8 +109,13 @@
                 $start      = $event->start;
                 $date       = Date::parse($event->start);
                 $todayMark  = ($date->format('Y-m-d') === $today) ? ' <small class="text-muted">(Сегодня)</small>' : '';
-                echo '<h3 class="mt-5 mb-3" id="day_'.$date->format('j').'">'.$date->format('j F').$todayMark."</h3>";
+                echo    '<h3 class="mt-5 mb-3" id="day_'.$date->format('j').'">'.
+                            '<small class="text-muted">'.$weekDays[$date->weekday()].'</small> '.$date->format('j F').$todayMark.
+                        "</h3>";
             }
+
+            $regular    = $event->regular ? "true": "false";
+            $jsId       = $event->regular ? $event->id."r": $event->id;
         @endphp
         <div class="row mb-2 ml-1">
             <div class="col-5">{{$event->title}}</div>
@@ -105,6 +129,24 @@
             </div>
 
             <div class="col-2"> {{$categories[intval($event->category)]}}  </div>
+            <div class="col-1">
+                <a  href="/calendar/add/{{$event->id.'/'.$regular}}/"
+                    {!! ($event->weekEvent > 0) ? 'style="display: none;"':"" !!}
+                    id="addLink_{{$jsId}}"
+                    onclick="addEvent({{$event->id.','.$regular}});return false;">
+
+                        <img class="icon" src="/img/add.png" title="Добавить">
+                </a>
+
+                <a  href="/calendar/delete/{{$event->weekEvent}}/"
+                    {!! ($event->weekEvent <= 0) ? 'style="display: none;"':"" !!}
+                    id="delLink_{{$jsId}}"
+                    data-id="{{$event->weekEvent}}"
+                    onclick="deleteEvent({{$event->id.','.$regular}});return false;">
+
+                        <img class="icon" src="/img/trash.png" title="Удалить">
+                </a>
+            </div>
         </div>
 
     @endforeach

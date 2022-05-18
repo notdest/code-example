@@ -8,6 +8,9 @@ class Event extends Model
 {
     protected $fillable     = ['title', 'category', 'start', 'end'];
 
+    public $regular     = false;
+    public $weekEvent   = 0;
+
     public static $categories = [
         1       => "Международные праздники",
         2       => "Праздники России",
