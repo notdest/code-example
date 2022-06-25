@@ -50,6 +50,12 @@ class parseLiveinternet implements ShouldQueue
             'n_y'               => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=n_y',
             'n_g'               => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=n_g',
             'android_google'    => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=android-google',
+            'smi2'              => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=smi2',
+            'vk'                => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=vk',
+            'm.vk.com'          => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=m.vk.com',
+            'facebook'          => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=facebook',
+            'm.facebook.com'    => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=m.facebook.com',
+            'ok'                => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=ok',
         ];
 
         if($this->append){

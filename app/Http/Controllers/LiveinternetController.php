@@ -70,6 +70,12 @@ class LiveinternetController extends Controller
             'n_y'               => "Яндекс новости",
             'n_g'               => "Google News",
             'android_google'    => "Гугл Дискавер",
+            'smi2'              => "СМИ2",
+            'vk'                => "Вконтакте",
+            'm.vk.com'          => "Вконтакте (моб.)",
+            'facebook'          => "Facebook",
+            'm.facebook.com'    => "Facebook (моб.)",
+            'ok'                => "Одноклассники",
         ];
         $tabName    = $names[$tab];
 
@@ -201,7 +207,8 @@ class LiveinternetController extends Controller
     private function getParams($request){
         $tab    = $request->tab     ?? 'zen';
         $day    = $request->date    ?? '-1 day';
-        if(!in_array($tab,['zen','social','yandex','ru', 's_googl', 'n_y', 'n_g', 'android_google'])){
+        if(!in_array($tab,['zen','social','yandex','ru', 's_googl', 'n_y', 'n_g', 'android_google', 'smi2', 'vk',
+                                                                    'm.vk.com', 'facebook', 'm.facebook.com', 'ok'])){
             $tab    = 'zen';
         }
         $date       = strtotime($day);
