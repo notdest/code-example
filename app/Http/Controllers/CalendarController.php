@@ -11,11 +11,7 @@ class CalendarController extends Controller
         $search = $this->getSearch($request);
         $events = $this->getEvents($search);
 
-        $weekEvents = $this->getWeekEvents($search);
-        $weekEvents = $weekEvents->groupBy(function ($item, $key) {
-            return trim($item['title']);
-        })->toArray();
-
+        $weekEvents = $this->getWeekEventsArray($search);           // Маркируем события добавленные в недельный список
         foreach ($events as $event) {
             $key    = trim($event->title);
             if(isset($weekEvents[$key])){
@@ -27,7 +23,7 @@ class CalendarController extends Controller
             }
         }
 
-        $days   = [];
+        $days   = [];                                               // Делаем массив дней для навигации по дням
         foreach ($events as $event) {
             $days[] = date('j',strtotime($event->start));
         }
@@ -84,7 +80,7 @@ class CalendarController extends Controller
         return $events;
     }
 
-    private function getWeekEvents($search){
+    private function getWeekEventsArray($search){
         $computeTime    = strtotime("{$search->year}-{$search->month}-05 00:00:00");
         $db = WeekEvent::where('end','>=',date('Y-m-01 00:00:00',$computeTime) );
         $db = $db->where(  'end','<=',date('Y-m-t 23:59:59' ,$computeTime) );
@@ -96,6 +92,9 @@ class CalendarController extends Controller
         $db = $db->orderBy('start', 'asc');
         $events = $db->take(1000)->get();
 
+        $events = $events->groupBy(function ($item, $key) {
+            return trim($item['title']);
+        })->toArray();
         return $events;
     }
 
@@ -109,11 +108,11 @@ class CalendarController extends Controller
         $from   = $dto->setISODate($search->year, $search->week)->format('Y-m-d 00:00:00');
         $to     = $dto->modify('+6 days')->format('Y-m-d 23:59:59');
 
-        $db = WeekEvent::where('end','>=',$from );
-        $db = $db->where(  'end','<=',$to);
-
-        $db = $db->orderBy('start', 'asc');
-        $events = $db->take(1000)->get();
+        $events = $this->getWeekEvents($from,$to);
+        if(count($events) <= 0){
+            $this->fillWeekEvents($from,$to);
+            $events = $this->getWeekEvents($from,$to);
+        }
 
         $days   = [];
         foreach ($events as $event) {
@@ -127,6 +126,48 @@ class CalendarController extends Controller
             'search'    => $search,
             'weekStart' => $from,
         ]);
+    }
+
+    private function getWeekEvents($from,$to){
+        $db     = WeekEvent::where('end','>=',$from );
+        $db     = $db->where(  'end','<=',$to);
+        $db     = $db->orderBy('start', 'asc');
+        $events = $db->take(1000)->get();
+        return $events;
+    }
+
+    private function fillWeekEvents($from,$to){
+        $from   = strtotime($from);
+        $to     = strtotime($to);
+
+        $search = new \stdClass();
+        $search->category   = 0;
+        $search->year       = date('Y',$from);
+        $search->month      = date('n',$from);
+
+        $events = $this->getEvents($search);
+        if(date('n',$from) !== date('n',$to)){
+            $search->year   = date('Y',$to);
+            $search->month  = date('n',$to);
+
+            $events = $events->concat($this->getEvents($search));
+        }
+
+        $events   = $events->filter(function ($v,$k)use($from,$to){
+            return (strtotime($v->end) >= $from)&&(strtotime($v->end) <= $to);
+        })->all();
+
+        $insertion  = [];
+        foreach ($events as $event) {
+            $insertion[]    = [
+                'title'     => trim($event->title),
+                'category'  => $event->category,
+                'start'     => $event->start,
+                'end'       => $event->end,
+            ];
+        }
+
+        WeekEvent::insert($insertion);
     }
 
     public function addWeekEvent(Request $request){
