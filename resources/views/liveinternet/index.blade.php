@@ -34,6 +34,24 @@
         <li class="nav-item">
             <a class="nav-link {{ ($tab === 'android_google') ? 'active': '' }}" href="/liveinternet/?tab=android_google">Гугл Дискавер</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'smi2') ? 'active': '' }}" href="/liveinternet/?tab=smi2">СМИ2</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'vk') ? 'active': '' }}" href="/liveinternet/?tab=vk">Вконтакте</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'm.vk.com') ? 'active': '' }}" href="/liveinternet/?tab=m.vk.com">Вконтакте (моб.)</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'facebook') ? 'active': '' }}" href="/liveinternet/?tab=facebook">Facebook</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'm.facebook.com') ? 'active': '' }}" href="/liveinternet/?tab=m.facebook.com">Facebook (моб.)</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'ok') ? 'active': '' }}" href="/liveinternet/?tab=ok">Одноклассники</a>
+        </li>
     </ul>
 
     <div class="clearfix mb-3 mt-5"  style="max-width: 70em;">
