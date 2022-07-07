@@ -39,6 +39,12 @@
                 window.scrollTo(0,   Math.round( $("#day_{{$currentDay}}").position().top ) - 200   );
             })
         @endif
+
+        function deleteEvent(id){
+            $.get( "/calendar/delete/"+id+"/", function() {
+                $('#event_'+id).remove();
+            });
+        }
     </script>
 
     <h2>Календарь на неделю <small class="text-muted">{{ $weekPeriod.' '. $search->year }} г.</small></h2>
@@ -71,7 +77,7 @@
                         "</h3>";
             }
         @endphp
-        <div class="row mb-2 ml-1">
+        <div class="row mb-2 ml-1" id="event_{{ $event->id }}">
             <div class="col-5">{{$event->title}}</div>
 
             <div class="col-1 p-0">
@@ -81,6 +87,13 @@
                     }
                 @endphp
             </div>
+        @can("admin")
+            <div class="col-1">
+                <a  href="/calendar/delete/{{$event->id}}/" onclick="deleteEvent({{ $event->id }});return false;">
+                    <img class="icon" src="/img/trash.png" title="Удалить">
+                </a>
+            </div>
+        @endcan
         </div>
 
     @endforeach
