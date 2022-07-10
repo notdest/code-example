@@ -56,6 +56,8 @@ class parseLiveinternet implements ShouldQueue
             'facebook'          => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=facebook',
             'm.facebook.com'    => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=m.facebook.com',
             'ok'                => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=ok',
+            'n-m'               => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=n-m',
+            's_mail'            => 'https://www.liveinternet.ru/stat/ru/media/servers.html?slice=s_mail',
         ];
 
         if($this->append){
