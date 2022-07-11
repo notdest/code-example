@@ -52,6 +52,12 @@
         <li class="nav-item">
             <a class="nav-link {{ ($tab === 'ok') ? 'active': '' }}" href="/liveinternet/?tab=ok">Одноклассники</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 'n-m') ? 'active': '' }}" href="/liveinternet/?tab=n-m">Mail новости</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ ($tab === 's_mail') ? 'active': '' }}" href="/liveinternet/?tab=s_mail">Mail поиск</a>
+        </li>
     </ul>
 
     <div class="clearfix mb-3 mt-5"  style="max-width: 70em;">
