@@ -36,6 +36,7 @@ class Kernel extends ConsoleKernel
 
         $schedule->command("run:oneParam parseLiveinternet yesterday")      ->dailyAt('4:09');
         $schedule->command("run:oneParam parseLiveinternetPages yesterday") ->dailyAt('4:26');
+        $schedule->command("run:oneParam LiveinternetAdditional yesterday") ->dailyAt('4:33');  // Строго после parseLiveinternet
     }
 
     /**
